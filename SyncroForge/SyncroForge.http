@@ -1,0 +1,6 @@
+@SyncroForge_HostAddress = http://localhost:5281
+
+GET {{SyncroForge_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
