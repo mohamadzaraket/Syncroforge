@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SyncroForge.Models;
 
 namespace SyncroForge.Data
 {
@@ -19,6 +20,12 @@ namespace SyncroForge.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<RefreshToken>().HasOne(i => i.User).WithMany(j => j.RefreshTokens).HasForeignKey(k => k.UserId);
+            modelBuilder.Entity<User>().HasIndex(i => i.Email).IsUnique();
         }
+        public DbSet<User> Users { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Otp> Otps { get; set; }
     }
 }

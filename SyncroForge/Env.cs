@@ -2,7 +2,7 @@
 {
     public static class Env
     {
-        public static string currentEnvironment = "Development";
+        public static string currentEnvironment { get; set; } = "Development";
 
     }
 }
