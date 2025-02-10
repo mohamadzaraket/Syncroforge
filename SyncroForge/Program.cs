@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
+using SyncroForge.Services.Guest;
 using System.Text;
 
 namespace SyncroForge
@@ -50,6 +51,7 @@ namespace SyncroForge
 
                 };
             });
+            builder.Services.AddTransient<IGuestService, GuestService>();
 
 
             var app = builder.Build();
