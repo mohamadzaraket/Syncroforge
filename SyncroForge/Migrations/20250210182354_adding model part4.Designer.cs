@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SyncroForge.Data;
 
@@ -10,9 +11,11 @@ using SyncroForge.Data;
 namespace SyncroForge.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210182354_adding model part4")]
+    partial class addingmodelpart4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -510,7 +513,7 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.User", "Creator")
                         .WithMany("CreatedCompanies")
                         .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Creator");
@@ -521,7 +524,7 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.Company", "Company")
                         .WithMany("Departments")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
@@ -532,13 +535,13 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.Department", "Department")
                         .WithMany("DepartmentEmployees")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Employee", "Employee")
                         .WithMany("DepartmentEmployees")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Department");
@@ -551,19 +554,19 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.Company", "Company")
                         .WithMany("Employees")
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Rule", "Rule")
                         .WithMany("Employees")
                         .HasForeignKey("RuleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.User", "User")
                         .WithMany("Employees")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
@@ -578,7 +581,7 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -589,31 +592,31 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.Employee", "Assignee")
                         .WithMany("AssignedTasks")
                         .HasForeignKey("AssigneeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Employee", "Creator")
                         .WithMany("CreatedTasks")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Department", "Department")
                         .WithMany("Tasks")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Task", "ParentTask")
                         .WithMany("SubTasks")
                         .HasForeignKey("ParentTaskId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Status", "Status")
                         .WithMany("Tasks")
                         .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Assignee");
@@ -632,13 +635,13 @@ namespace SyncroForge.Migrations
                     b.HasOne("SyncroForge.Models.Employee", "Employee")
                         .WithMany("TaskHistories")
                         .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SyncroForge.Models.Task", "Task")
                         .WithMany("Histories")
                         .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");
