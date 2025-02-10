@@ -11,8 +11,8 @@ using SyncroForge.Data;
 namespace SyncroForge.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250210182719_adding model part5")]
-    partial class addingmodelpart5
+    [Migration("20250210185342_start")]
+    partial class start
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
