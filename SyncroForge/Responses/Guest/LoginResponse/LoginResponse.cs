@@ -1,20 +1,16 @@
-﻿namespace SyncroForge.Responses.Guest.RegisterResponse
+﻿namespace SyncroForge.Responses.Guest.LoginResponse
 {
-    public class RegisterResponse : BaseResponse
+    public class LoginResponse : BaseResponse
     {
         public override int Status { get; set; }
         public override string Message { get; set; }
-        public override string Type { get; set; }
+        public override string Type { get; set ; }
         public override bool Success { get; set; }
         public override int Code { get; set; }
-
-        public RegisterResponse()
-        {
-
-        }
-
-
+        public object? data {  get; set; }
     }
 
 
+
+    
 }
