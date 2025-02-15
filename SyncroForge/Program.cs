@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
+using SyncroForge.Services;
 using SyncroForge.Services.Guest;
 using SyncroForge.Services.Otp;
 using System.Text;
@@ -56,6 +57,7 @@ namespace SyncroForge
             builder.Services.AddHttpClient();
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<IOtpService, OtpService>();
+            builder.Services.AddSingleton<MinioService>();
 
 
             var app = builder.Build();

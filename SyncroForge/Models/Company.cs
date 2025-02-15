@@ -13,7 +13,7 @@ namespace SyncroForge.Models
         public string Description { get; set; }
         public int CreatedBy { get; set; }
         public virtual User Creator { get; set; }
-        public string Logo_Url { get; set; }
+        public string? Logo_Url { get; set; }
         public long CreatedAt { get; set; }
         public long UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
