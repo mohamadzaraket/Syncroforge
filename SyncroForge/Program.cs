@@ -1,7 +1,12 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
+using SyncroForge.Services.Guest;
+using SyncroForge.Services.Otp;
+using System.Text;
 
 namespace SyncroForge
 {
@@ -23,6 +28,34 @@ namespace SyncroForge
            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             builder.Configuration.AddJsonFile($"appsettings.{Env.currentEnvironment}.json", optional: true, reloadOnChange: true);
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication(options =>
+
+
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateActor = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    RequireExpirationTime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
+                    ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value))
+
+
+                };
+            });
+            builder.Services.AddHttpClient();
+            builder.Services.AddTransient<IGuestService, GuestService>();
+            builder.Services.AddTransient<IOtpService, OtpService>();
 
 
             var app = builder.Build();
@@ -35,7 +68,7 @@ namespace SyncroForge
             }
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
