@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
 using SyncroForge.Services;
+using SyncroForge.Services.Company;
 using SyncroForge.Services.Guest;
 using SyncroForge.Services.Otp;
 using System.Text;
@@ -58,6 +59,7 @@ namespace SyncroForge
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<IOtpService, OtpService>();
             builder.Services.AddSingleton<MinioService>();
+            builder.Services.AddTransient<ICompanyService, CompanyService>();
 
 
             var app = builder.Build();

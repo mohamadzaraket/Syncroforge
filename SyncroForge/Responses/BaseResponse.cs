@@ -11,6 +11,7 @@
 
             public abstract bool Success { get; set; }
             public abstract int Code { get; set; }
+            public object? data { get; set; }
             public BaseResponse() { }
 
 
