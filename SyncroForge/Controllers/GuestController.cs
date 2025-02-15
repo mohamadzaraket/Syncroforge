@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Models;
 using SyncroForge.Requests.Guest;
 using SyncroForge.Responses.Guest.LoginResponse;
+using SyncroForge.Responses.Guest.RefreshToken;
 using SyncroForge.Responses.Guest.RegisterResponse;
 using SyncroForge.Services.Guest;
 using System.IdentityModel.Tokens.Jwt;
@@ -67,16 +68,28 @@ namespace SyncroForge.Controllers
 
         }
 
-        /*public async Task<IActionResult> Login()
+        [HttpPost]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            return
+            try
+            {
+
+                RefreshTokenResponse response = await _guestService.RefreshToken(request);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while trying to get Token"
+                });
+            }
+
+
 
         }
-
-        public async Task<IActionResult> CheckIfEmailAlreadyExist()
-        {
-
-        }*/
 
     }
 }

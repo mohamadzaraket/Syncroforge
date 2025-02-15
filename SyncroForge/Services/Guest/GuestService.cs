@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using SyncroForge.Responses.Guest.RefreshToken;
 namespace SyncroForge.Services.Guest
 {
     public class GuestService : IGuestService
@@ -26,7 +27,7 @@ namespace SyncroForge.Services.Guest
 
         public async Task<LoginResponse> Login(Requests.Guest.LoginRequest request)
         {
-            User user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
+            User? user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
 
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
@@ -152,6 +153,56 @@ namespace SyncroForge.Services.Guest
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
             }
+        }
+
+        public async Task<RefreshTokenResponse> RefreshToken(RefreshTokenRequest request)
+        {
+            RefreshToken? token = await _context.RefreshTokens.Include(i=>i.User).Where( i=>i.Token==request.RefreshToken).FirstOrDefaultAsync();
+            long currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            if (token == null|| token.ExpiryAt< currentTime)
+            {
+                  return new RefreshTokenResponse()
+
+                {
+
+                    Status = 400,
+
+                    Message = "invalid or expired token",
+
+                    Success = false,
+
+                    Type = "invalid credential",
+
+                    Code = 400
+
+                };
+            }
+             Console.WriteLine(token.User);
+            String Token = await GenerateTokenString(token.User);
+          
+
+            String RefreshToken = GenerateRefreshToken();
+            await _context.RefreshTokens.AddAsync(new RefreshToken()
+            {
+                UserId = token.User.Id,
+                Token = RefreshToken
+            });
+            await _context.SaveChangesAsync();
+
+            return new RefreshTokenResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Success = true,
+                Message = "new Token generated successfully",
+                Type = "authorized",
+                data = new
+                {
+                    refreshToken = RefreshToken,
+                    accessToken = Token
+                }
+            };
+
         }
     }
 }
