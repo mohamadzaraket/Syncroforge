@@ -104,7 +104,15 @@ namespace SyncroForge.Services.Company
             }
 
 
-            List<companny> companies = await _context.Companies.OrderBy(i => i.Id).Where(j => j.CreatedBy == userId).Skip(request.StartAt).Take(request.Limit).ToListAsync();
+            var companies = await _context.Companies.OrderBy(i => i.Id).Where(j => j.CreatedBy == userId && j.IsDeleted==false).Skip(request.StartAt).Take(request.Limit).Select(k=>new
+            {
+                idenitifier = k.PublicKey,
+                Name = k.Name,
+                Description = k.Description,
+                logoUrl = k.Logo_Url,
+                CreatedAt = k.CreatedAt,
+                UpdatedAt = k.UpdatedAt
+            }).ToListAsync();
 
             return new MainResponse()
             {
