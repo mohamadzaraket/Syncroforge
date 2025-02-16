@@ -125,5 +125,163 @@ namespace SyncroForge.Services.Company
 
 
         }
+
+        public async Task<MainResponse> UpdateCompany(UpdateCompanyRequest request, string userPublicKey, int userId)
+        {
+     companny? UpdatedCompany= await _context.Companies.Where(i => i.PublicKey==request.publicCompanyId && i.CreatedBy == userId && i.IsDeleted==false).FirstOrDefaultAsync();
+            if(UpdatedCompany == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "company dose not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            }
+
+
+            companny? findedCompany = await _context.Companies.Where(i => i.Name == request.Name && i.CreatedBy!=userId && i.IsDeleted==false).FirstOrDefaultAsync();
+
+            if (findedCompany != null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "company name already exists",
+                    Status = 400,
+                    Success = false,
+                    Type = "name conflict"
+                };
+            }
+
+       
+
+
+
+            UpdatedCompany.Name = request.Name;
+            UpdatedCompany.Description = request.Description;
+
+
+
+
+            
+            if (request.CompanyLogo != null)
+            {
+                string baseLogoName = $"{Guid.NewGuid().ToString()}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_{Path.GetFileName(request.CompanyLogo.FileName)}";
+                if (UpdatedCompany.Logo_Url != null)
+                {
+          await  _minioService.DeleteFileAsync(UpdatedCompany.Logo_Url);
+                }
+                
+                using var stream = request.CompanyLogo.OpenReadStream();
+                string logoPath = await _minioService.UploadFileAsync(stream, $"{userPublicKey}/company/{UpdatedCompany.PublicKey}/logo/{baseLogoName}");
+                UpdatedCompany.Logo_Url = logoPath;
+            }
+            else
+            {
+                if (UpdatedCompany.Logo_Url != null)
+                {
+                    await _minioService.DeleteFileAsync(UpdatedCompany.Logo_Url);
+                }
+                UpdatedCompany.Logo_Url = null;
+            }
+            
+            await _context.SaveChangesAsync();
+           
+            return new MainResponse()
+            {
+                Code = 200,
+                Message = "Company updated successfully",
+                Status = 200,
+                Type = "Company Update",
+                Success = true,
+                data = new
+                {
+                    identifier = UpdatedCompany.PublicKey,
+                    name = UpdatedCompany.Name,
+                    description = UpdatedCompany.Description,
+                    logoPath = UpdatedCompany.Logo_Url,
+
+
+                }
+            };
+            
+
+        }
+
+        public async Task<MainResponse> GetCompany(GetCompanyRequest request, string id)
+        {
+            companny? company=null;
+        if (request.WithDepartment && request.WithEmployee)
+            {
+              company = await _context.Companies.Include(i=>i.Employees).Include(i=>i.Departments).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+ 
+            }else if(request.WithDepartment && request.WithEmployee==false)
+            {
+                company = await _context.Companies.Include(i => i.Departments).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+
+            }
+            else if(request.WithDepartment==false && request.WithEmployee )
+            {
+                company = await _context.Companies.Include(i => i.Employees).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+
+            }
+            else
+            {
+                company = await _context.Companies.Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+
+            }
+
+            if (company == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "company dose not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            }
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Message = "Company sent successfully",
+                Status = 200,
+                Type = "Company Found",
+                Success = true,
+                data = new
+                {
+                    company = new
+                    {
+                        company.PublicKey,
+                        company.Name,
+                        company.Logo_Url,
+                        company.Description,
+                       
+                        Employees = company.Employees?.Select(e => new
+                        {  
+                            e.PublicKey,
+                            e.User.Email,
+                            e.User.FirstName,
+                            e.User.LastName,
+                           
+                           
+                        }),
+                        Departments = company.Departments?.Select(d => new
+                        {
+                            d.PublicKey,
+                            d.Name,
+                            d.Logo,
+                        }),
+                    }
+                }
+            };
+
+
+        }
     }
 }
