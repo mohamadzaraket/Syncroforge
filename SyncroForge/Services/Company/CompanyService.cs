@@ -2,8 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using SyncroForge.Data;
 using SyncroForge.Models;
+using SyncroForge.Requests.Comany;
 using SyncroForge.Requests.Company;
 using SyncroForge.Responses;
+using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using companny = SyncroForge.Models.Company;
 
 
@@ -54,6 +57,18 @@ namespace SyncroForge.Services.Company
             }
 
             await _context.Companies.AddAsync(addedCompany);
+            Count count = await _context.Counts.Where(i => i.Id == 1).FirstOrDefaultAsync();
+            Dictionary<String, object> jsonInfo = JsonSerializer.Deserialize<Dictionary<String, object>>(count.JsonInfo);
+            if(jsonInfo.ContainsKey($"{userPublicKey} >> company"))
+            {
+                jsonInfo[$"{userPublicKey} >> company"] = ((JsonElement)jsonInfo[$"{userPublicKey} >> company"]).GetInt32() + 1;
+            }
+            else
+            {
+                jsonInfo[$"{userPublicKey} >> company"] = 1;
+            }
+            count.JsonInfo = JsonSerializer.Serialize(jsonInfo);
+
             await _context.SaveChangesAsync();
             return new MainResponse()
             {
@@ -74,6 +89,39 @@ namespace SyncroForge.Services.Company
             };
 
 
+
+
+        }
+
+        public async Task<MainResponse> GetCompanies(GetCompaniesRequest request, int userId,string userPublicKey)
+        {
+            Count count = await _context.Counts.Where(i => i.Id == 1).FirstOrDefaultAsync();
+            Dictionary<String, object> jsonInfo = JsonSerializer.Deserialize<Dictionary<string,object>>(count.JsonInfo);
+            int totalCompanies = 0;
+            if(jsonInfo.ContainsKey($"{userPublicKey} >> company")){
+                totalCompanies = ((JsonElement)jsonInfo[$"{userPublicKey} >> company"]).GetInt32();
+
+            }
+
+
+            List<companny> companies = await _context.Companies.OrderBy(i => i.Id).Where(j => j.CreatedBy == userId).Skip(request.StartAt).Take(request.Limit).ToListAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "companies returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    startAt = request.StartAt,
+                    limit = request.Limit,
+                    totalCompanies = totalCompanies,
+                    companies = companies
+                }
+            };
+            
 
 
         }
