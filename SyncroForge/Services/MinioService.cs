@@ -67,11 +67,12 @@ namespace SyncroForge.Services
         {
             try
             {
-                Uri uri = new Uri(objectName);
+                string key = objectName.Replace(_endpoint + "/" + _bucketName + "/", "");
+
 
                 await _minioClient.RemoveObjectAsync(new RemoveObjectArgs()
                     .WithBucket(_bucketName)
-                    .WithObject(uri.Segments.Last().Trim('/')));
+                    .WithObject(key));
             }
             catch (Exception ex)
             {
