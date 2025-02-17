@@ -43,6 +43,9 @@ namespace SyncroForge.Data
             modelBuilder.Entity<Taskk>().HasOne(i => i.Assignee).WithMany(t => t.AssignedTasks).HasForeignKey(u => u.AssigneeId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Taskk>().HasOne(i => i.Creator).WithMany(t => t.CreatedTasks).HasForeignKey(u => u.CreatedById).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Taskk>().HasOne(i=>i.Status).WithMany(t=>t.Tasks).HasForeignKey(u=>u.StatusId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<CompanyInviteUser>().HasOne(i=>i.Company).WithMany(j=>j.invitedUsers).HasForeignKey(k=>k.CompanyId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<CompanyInviteUser>().HasOne(i => i.User).WithMany(j => j.Invites).HasForeignKey(k => k.UserId).OnDelete(DeleteBehavior.NoAction);
+
 
         }
         public DbSet<User> Users { get; set; }
@@ -57,6 +60,7 @@ namespace SyncroForge.Data
         public DbSet<TaskHistory> TaskHistories { get; set; }
         public DbSet<Count> Counts { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<CompanyInviteUser> CompaniesInviteduser { get; set; }
 
 
     }

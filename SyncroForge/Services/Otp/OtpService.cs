@@ -9,6 +9,7 @@ using System;
 using SyncroForge.Models;
 using Microsoft.EntityFrameworkCore;
 using Otpp = SyncroForge.Models.Otp;
+using userr = SyncroForge.Models.User;
 
 namespace SyncroForge.Services.Otp
 {
@@ -26,7 +27,7 @@ namespace SyncroForge.Services.Otp
 
         public async Task<RegisterResponse> Register(RegisterRequest request)
         {
-            User user=await _context.Users.Where(i=>i.Email==request.Email).FirstOrDefaultAsync();
+            userr user =await _context.Users.Where(i=>i.Email==request.Email).FirstOrDefaultAsync();
             if (user != null) {
                 return new RegisterResponse()
                 {

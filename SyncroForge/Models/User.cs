@@ -23,6 +23,7 @@ namespace SyncroForge.Models
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
         public virtual ICollection< Employee> Employees { get; set; }
         public virtual ICollection< Company> CreatedCompanies { get; set; }
+        public virtual ICollection<CompanyInviteUser> Invites {  get; set; }
 
         public User()
         {

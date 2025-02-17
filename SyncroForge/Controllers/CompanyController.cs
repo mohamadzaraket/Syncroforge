@@ -6,6 +6,7 @@ using SyncroForge.Requests.Comany;
 using SyncroForge.Requests.Company;
 using SyncroForge.Responses;
 using SyncroForge.Services.Company;
+using System.ComponentModel.Design;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -143,5 +144,53 @@ namespace SyncroForge.Controllers
         }
 
     }
-}
+        [HttpPost]
+        public async Task<IActionResult> InviteUser(InviteUserRequest request)
+        {
+            try
+            {
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+                MainResponse response = await _companyService.InviteUser(request, userId);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while inviting user"
+                });
+            }
+
+        }
+        [HttpGet("{companyId}")]
+        public async Task<IActionResult> GetInvitations([FromQuery]GetInvitationsRequest request,string companyId)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+                MainResponse response = await _companyService.GetInvitations(request, companyId);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while inviting user"
+                });
+            }
+        }
+
+    }
   }

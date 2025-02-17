@@ -19,6 +19,8 @@ namespace SyncroForge.Models
         public bool IsDeleted { get; set; }
         public virtual ICollection<Employee> Employees { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<CompanyInviteUser> invitedUsers {  get; set; }
+
 
         public Company()
         {

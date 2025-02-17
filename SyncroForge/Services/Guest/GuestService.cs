@@ -14,7 +14,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using SyncroForge.Responses.Guest.RefreshToken;
+using Userr = SyncroForge.Models.User;
 namespace SyncroForge.Services.Guest
+
 {
     public class GuestService : IGuestService
     {
@@ -27,7 +29,7 @@ namespace SyncroForge.Services.Guest
 
         public async Task<LoginResponse> Login(Requests.Guest.LoginRequest request)
         {
-            User? user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
+            Userr? user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
 
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
@@ -70,7 +72,7 @@ namespace SyncroForge.Services.Guest
 
         public async Task<RegisterResponse> Register(Requests.Guest.RegisterRequest request)
         {
-            User user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
+            Userr user = await _context.Users.Where(i => i.Email == request.Email).FirstOrDefaultAsync();
             if (user != null)
             {
                 return new RegisterResponse()
@@ -108,7 +110,7 @@ namespace SyncroForge.Services.Guest
 
             }
 
-            await _context.Users.AddAsync(new User()
+            await _context.Users.AddAsync(new Userr()
             {
                 Email = request.Email,
                 FirstName = request.FirstName,
@@ -121,7 +123,7 @@ namespace SyncroForge.Services.Guest
 
 
         }
-        private async Task<string> GenerateTokenString(User user)
+        private async Task<string> GenerateTokenString(Userr user)
         {
 
             var claims = new List<Claim>

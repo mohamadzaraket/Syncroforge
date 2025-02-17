@@ -10,6 +10,9 @@ namespace SyncroForge.Services.Company
         public Task<MainResponse> GetCompanies(GetCompaniesRequest request, int userId, string userPublicKey);
         public Task<MainResponse> UpdateCompany(UpdateCompanyRequest request, string userPublicKey, int userId);
         public Task<MainResponse> GetCompany(GetCompanyRequest request, String id);
+        public Task<MainResponse> InviteUser(InviteUserRequest request, int userId);
+
+        public Task<MainResponse> GetInvitations(GetInvitationsRequest request,String id);
 
     }
 }

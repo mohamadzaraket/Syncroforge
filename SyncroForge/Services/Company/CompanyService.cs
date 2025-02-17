@@ -8,6 +8,7 @@ using SyncroForge.Responses;
 using System.Text.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using companny = SyncroForge.Models.Company;
+using userr = SyncroForge.Models.User;
 
 
 namespace SyncroForge.Services.Company
@@ -22,7 +23,7 @@ namespace SyncroForge.Services.Company
             _minioService = minioService;
             _context = context;
         }
-        [HttpPost]
+        
         public async Task<MainResponse> AddCompany(AddCompanyRequest request,string userPublicKey,int userId)
         {
             companny findedCompany = await _context.Companies.Where(i => i.Name == request.Name).FirstOrDefaultAsync();
@@ -289,6 +290,175 @@ namespace SyncroForge.Services.Company
                 }
             };
 
+
+        }
+
+        public async Task<MainResponse> InviteUser(InviteUserRequest request, int userId)
+        {
+            string companyIdentifier = request.CompanyIdentifier;
+            string userIdentifier = request.UserIdentifier;
+
+            companny findedCompany = await _context.Companies.Include(i=>i.Employees).Where(j => j.PublicKey == companyIdentifier).FirstOrDefaultAsync();
+
+            if (findedCompany == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "company does not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            };
+            userr findedUser = await _context.Users.Where(i => i.PublicKey == userIdentifier).FirstOrDefaultAsync();
+
+            if(findedUser == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "user does not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            }
+            Employee findedEmployee = findedCompany.Employees.Where(i => i.UserId == findedUser.Id).FirstOrDefault();
+            if (findedEmployee != null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "this user is already an employee in your company",
+                    Status = 400,
+                    Success = false,
+                    Type = "already employee"
+                };
+            }
+            if (findedCompany.CreatedBy == findedUser.Id)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant invite yourself",
+                    Status = 400,
+                    Success = false,
+                    Type = "conflict"
+                };
+            }
+            CompanyInviteUser findedInvitation = await _context.CompaniesInviteduser.Where(i => i.UserId == findedUser.Id && i.CompanyId == findedCompany.Id).FirstOrDefaultAsync();
+            if (findedInvitation != null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you have a request or invitation from/to this company",
+                    Status = 400,
+                    Success = false,
+                    Type = "already requested/invited"
+                };
+            }
+            await _context.CompaniesInviteduser.AddAsync(new CompanyInviteUser()
+            {
+                CompanyId = findedCompany.Id,
+                joinedByUser = false,
+                UserId = findedUser.Id
+            });
+            Count count = await _context.Counts.Where(i => i.Id == 1).FirstOrDefaultAsync();
+            Dictionary<String, object> jsonInfo = JsonSerializer.Deserialize<Dictionary<String, object>>(count.JsonInfo);
+            if (jsonInfo.ContainsKey($"{findedCompany.PublicKey} >> invitedUsers"))
+            {
+                jsonInfo[$"{findedCompany.PublicKey} >> invitedUsers"] = ((JsonElement)jsonInfo[$"{findedCompany.PublicKey} >> invitedUsers"]).GetInt32() + 1;
+            }
+            else
+            {
+                jsonInfo[$"{findedCompany.PublicKey} >> invitedUsers"] = 1;
+            }
+            if (jsonInfo.ContainsKey($"{findedUser.PublicKey} >> requestsToJoin"))
+            {
+                jsonInfo[$"{findedUser.PublicKey} >> requestsToJoin"] = ((JsonElement)jsonInfo[$"{findedCompany.PublicKey} >> requestsToJoin"]).GetInt32() + 1;
+            }
+            else
+            {
+                jsonInfo[$"{findedUser.PublicKey} >> requestsToJoin"] = 1;
+            }
+            count.JsonInfo = JsonSerializer.Serialize(jsonInfo);
+            await _context.SaveChangesAsync();
+
+            await _context.SaveChangesAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Message = "invitation is sended",
+                Status = 200,
+                Success = true,
+                Type = "request done",
+                data = new
+                {
+                    companyId = findedCompany.PublicKey,
+                    userId=findedUser.PublicKey
+                }
+            };
+
+
+
+
+        }
+
+        public async Task<MainResponse> GetInvitations(GetInvitationsRequest request,string id)
+        {
+            companny findedCompany=await _context.Companies.Where(i=>i.PublicKey==id).FirstOrDefaultAsync();
+            if (findedCompany == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "company does not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "not found"
+                };
+            }
+            Count count = await _context.Counts.Where(i => i.Id == 1).FirstOrDefaultAsync();
+            Dictionary<String, object> jsonInfo = JsonSerializer.Deserialize<Dictionary<string, object>>(count.JsonInfo);
+            int totalInvitations = 0;
+            if (jsonInfo.ContainsKey($"{id} >> invitedUsers"))
+            {
+                totalInvitations =  ((JsonElement)jsonInfo[$"{id} >> invitedUsers"]).GetInt32();
+
+            }
+
+
+            var invitations = await _context.CompaniesInviteduser.Include(j=>j.User).OrderByDescending(i => i.Id).Where(j => j.CompanyId==findedCompany.Id).Skip(request.StartAt).Take(request.Limit).Select(k => new
+            {
+                idenitifier = k.PublicKey,
+                isJoinedByUser=k.joinedByUser,
+                user=new
+                {
+                    identifier=k.User.PublicKey,
+                    profile=k.User.ProfileUrl,
+                    email=k.User.Email
+                }
+ 
+            }).ToListAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "invitations returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    startAt = request.StartAt,
+                    limit = request.Limit,
+                    invitations = invitations,
+                    total= totalInvitations
+                }
+            };
 
         }
     }
