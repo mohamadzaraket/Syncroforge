@@ -59,7 +59,8 @@ namespace SyncroForge
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<IOtpService, OtpService>();
             builder.Services.AddSingleton<MinioService>();
-            builder.Services.AddTransient<ICompanyService, CompanyService>();
+            builder.Services.AddTransient<ICompanyService, CompanyService>(); 
+            builder.Services.AddTransient<IDepartmentService, DepartmentService>();
 
 
             var app = builder.Build();
