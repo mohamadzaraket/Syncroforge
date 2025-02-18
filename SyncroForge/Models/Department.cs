@@ -13,7 +13,7 @@ namespace SyncroForge.Models
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }
         public string Name { get; set; }
-        public string Logo { get; set; }
+        public string? Logo { get; set; }
         public long CreatedAt { get; set; }
         public long UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }

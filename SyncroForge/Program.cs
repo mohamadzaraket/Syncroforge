@@ -60,6 +60,7 @@ namespace SyncroForge
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<IOtpService, OtpService>();
             builder.Services.AddSingleton<MinioService>();
+            builder.Services.AddTransient<IDepartmentService, DepartmentService>();
             builder.Services.AddTransient<ICompanyService, CompanyService>();
             builder.Services.AddTransient<IUserService,UserService>();
 
