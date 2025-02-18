@@ -513,7 +513,7 @@ namespace SyncroForge.Services.Company
             inviteRequest.status = request.ReplyValue;
             if (request.ReplyValue == 1)
             {
-                Rule rule = await _context.Rule.Where(i => i.RuleName == "User").FirstOrDefaultAsync();
+                Rule rule = await _context.Rule.Where(i => i.RuleName == "Employee").FirstOrDefaultAsync();
                 Employee employee = new Employee()
                 {
                     RuleId = rule.Id,

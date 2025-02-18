@@ -204,7 +204,7 @@ namespace SyncroForge.Services.User
             inviteRequest.status = request.ReplyValue;
             if (request.ReplyValue == 1)
             {
-                Rule rule = await _appDbContext.Rule.Where(i => i.RuleName == "User").FirstOrDefaultAsync();
+                Rule rule = await _appDbContext.Rule.Where(i => i.RuleName == "Employee").FirstOrDefaultAsync();
                 Employee employee = new Employee()
                 {
                     RuleId = rule.Id,
