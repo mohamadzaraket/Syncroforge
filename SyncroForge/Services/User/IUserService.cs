@@ -7,5 +7,6 @@ namespace SyncroForge.Services.User
     {
         public Task<MainResponse> JoinCompany(JoinCompanyRequest request,int userId, string publicUserId);
         public Task<MainResponse> GetInvitations(GetInvitationsRequest request, int userId, string publicUserId);
+        public Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request);
     }
 }

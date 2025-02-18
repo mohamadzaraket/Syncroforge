@@ -191,6 +191,25 @@ namespace SyncroForge.Controllers
                 });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> ReplyForInvite([FromBody] ReplyForInviteRequest request)
+        {
+            try
+            {
+                MainResponse response = await _companyService.ReplyForInvite(request);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while replying for invite"
+                });
+            }
+        }
 
     }
   }
