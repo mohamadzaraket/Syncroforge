@@ -13,6 +13,7 @@ namespace SyncroForge.Services.Company
         public Task<MainResponse> InviteUser(InviteUserRequest request, int userId);
 
         public Task<MainResponse> GetInvitations(GetInvitationsRequest request,String id);
+        public Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request);
 
     }
 }
