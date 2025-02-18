@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SyncroForge.Data;
 
@@ -10,9 +11,11 @@ using SyncroForge.Data;
 namespace SyncroForge.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250215160620_makingcomanyurlnull")]
+    partial class makingcomanyurlnull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,45 +69,6 @@ namespace SyncroForge.Migrations
                     b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("SyncroForge.Models.CompanyInviteUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("PublicKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("UpdatedAt")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("joinedByUser")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CompaniesInviteduser");
-                });
-
             modelBuilder.Entity("SyncroForge.Models.Count", b =>
                 {
                     b.Property<int>("Id")
@@ -115,7 +79,7 @@ namespace SyncroForge.Migrations
 
                     b.Property<string>("JsonInfo")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PublicKey")
                         .IsRequired()
@@ -144,6 +108,7 @@ namespace SyncroForge.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Logo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -553,25 +518,6 @@ namespace SyncroForge.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("SyncroForge.Models.CompanyInviteUser", b =>
-                {
-                    b.HasOne("SyncroForge.Models.Company", "Company")
-                        .WithMany("invitedUsers")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("SyncroForge.Models.User", "User")
-                        .WithMany("Invites")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SyncroForge.Models.Department", b =>
                 {
                     b.HasOne("SyncroForge.Models.Company", "Company")
@@ -707,8 +653,6 @@ namespace SyncroForge.Migrations
                     b.Navigation("Departments");
 
                     b.Navigation("Employees");
-
-                    b.Navigation("invitedUsers");
                 });
 
             modelBuilder.Entity("SyncroForge.Models.Department", b =>
@@ -751,8 +695,6 @@ namespace SyncroForge.Migrations
                     b.Navigation("CreatedCompanies");
 
                     b.Navigation("Employees");
-
-                    b.Navigation("Invites");
 
                     b.Navigation("RefreshTokens");
                 });

@@ -21,6 +21,9 @@ namespace SyncroForge.Models
         public bool TwoFa {get;set;}
         public bool IsDeleted { get; set;}
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
+        public virtual ICollection< Employee> Employees { get; set; }
+        public virtual ICollection< Company> CreatedCompanies { get; set; }
+        public virtual ICollection<CompanyInviteUser> Invites {  get; set; }
 
         public User()
         {
