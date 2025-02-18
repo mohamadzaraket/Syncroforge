@@ -153,6 +153,96 @@ namespace SyncroForge.Services.User
 
         }
 
+        public async Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request)
+        {
+            string inviteId = request.InviteId;
+            CompanyInviteUser inviteRequest = await _appDbContext.CompaniesInviteduser.Where(i => i.PublicKey == inviteId).FirstOrDefaultAsync();
+            if (inviteRequest == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "no invite request found",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not Found"
+                };
+            }
+            if (inviteRequest.joinedByUser == true)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant reply for your join request, you can only reply for invite",
+                    Status = 400,
+                    Success = false,
+                    Type = "your invite"
+                };
+            }
+            if (inviteRequest.status == 2)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant change rejected status",
+                    Status = 400,
+                    Success = false,
+                    Type = "rejected"
+                };
+            }
+            if (inviteRequest.status == 1)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant change accepted status",
+                    Status = 400,
+                    Success = false,
+                    Type = "rejected"
+                };
+            }
+            inviteRequest.status = request.ReplyValue;
+            if (request.ReplyValue == 1)
+            {
+                Rule rule = await _appDbContext.Rule.Where(i => i.RuleName == "User").FirstOrDefaultAsync();
+                Employee employee = new Employee()
+                {
+                    RuleId = rule.Id,
+                    UserId = inviteRequest.UserId,
+                    CompanyId = inviteRequest.CompanyId
 
+                };
+                await _appDbContext.Employees.AddAsync(employee);
+                await _appDbContext.SaveChangesAsync();
+                return new MainResponse()
+                {
+                    Code = 200,
+                    Status = 200,
+                    Message = "User joined successfully",
+                    Success = true,
+                    Type = "success",
+                    data = new
+                    {
+                        employeeId = employee.PublicKey
+                    }
+
+                };
+
+            };
+            await _appDbContext.SaveChangesAsync();
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "User reject invitation succesfully",
+                Success = true,
+                Type = "success",
+
+
+            };
+
+
+
+        }
     }
 }

@@ -377,7 +377,7 @@ namespace SyncroForge.Services.Company
             }
             if (jsonInfo.ContainsKey($"{findedUser.PublicKey} >> requestsToJoin"))
             {
-                jsonInfo[$"{findedUser.PublicKey} >> requestsToJoin"] = ((JsonElement)jsonInfo[$"{findedCompany.PublicKey} >> requestsToJoin"]).GetInt32() + 1;
+                jsonInfo[$"{findedUser.PublicKey} >> requestsToJoin"] = ((JsonElement)jsonInfo[$"{findedUser.PublicKey} >> requestsToJoin"]).GetInt32() + 1;
             }
             else
             {
@@ -459,6 +459,98 @@ namespace SyncroForge.Services.Company
                     total= totalInvitations
                 }
             };
+
+        }
+
+        public async Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request)
+        {
+            string inviteId = request.InviteId;
+            CompanyInviteUser inviteRequest = await _context.CompaniesInviteduser.Where(i => i.PublicKey == inviteId).FirstOrDefaultAsync();
+            if (inviteRequest == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "no invite request found",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not Found"
+                };
+            }
+            if (inviteRequest.joinedByUser == false)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant reply for your invite, you can only reply for join",
+                    Status = 400,
+                    Success = false,
+                    Type = "your invite"
+                };
+            }
+            if (inviteRequest.status == 2)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant change rejected status, but you can invite the user another time",
+                    Status = 400,
+                    Success = false,
+                    Type = "rejected"
+                };
+            }
+            if (inviteRequest.status == 1)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "you cant change accepted status, but you can invite the user another time",
+                    Status = 400,
+                    Success = false,
+                    Type = "rejected"
+                };
+            }
+            inviteRequest.status = request.ReplyValue;
+            if (request.ReplyValue == 1)
+            {
+                Rule rule = await _context.Rule.Where(i => i.RuleName == "User").FirstOrDefaultAsync();
+                Employee employee = new Employee()
+                {
+                    RuleId = rule.Id,
+                    UserId = inviteRequest.UserId,
+                    CompanyId=inviteRequest.CompanyId
+                   
+                };
+                await _context.Employees.AddAsync(employee);
+                await _context.SaveChangesAsync();
+                return new MainResponse()
+                {
+                    Code = 200,
+                    Status = 200,
+                    Message = "User accepted successfully",
+                    Success = true,
+                    Type = "success",
+                    data = new
+                    {
+                        employeeId =employee.PublicKey
+                }
+
+                };
+
+            };
+            await _context.SaveChangesAsync();
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "User rejected successfully",
+                Success = true,
+                Type = "success",
+
+
+            };
+            
+
 
         }
     }
