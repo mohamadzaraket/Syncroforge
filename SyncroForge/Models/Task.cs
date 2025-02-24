@@ -9,7 +9,7 @@ namespace SyncroForge.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string PublicKey { get; set; }
-        public int ParentTaskId { get; set; }
+        public int? ParentTaskId { get; set; }
         public virtual Task ParentTask { get; set; }
         public string Summary { get; set; }
         public string Description { get; set; }
