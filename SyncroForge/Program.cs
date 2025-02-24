@@ -6,8 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
 using SyncroForge.Services;
 using SyncroForge.Services.Company;
+using SyncroForge.Services.EmployeeService;
 using SyncroForge.Services.Guest;
 using SyncroForge.Services.Otp;
+using SyncroForge.Services.StatusService;
 using SyncroForge.Services.User;
 using System.Text;
 
@@ -63,6 +65,9 @@ namespace SyncroForge
             builder.Services.AddTransient<IDepartmentService, DepartmentService>();
             builder.Services.AddTransient<ICompanyService, CompanyService>();
             builder.Services.AddTransient<IUserService,UserService>();
+            builder.Services.AddTransient<IDepartmentEmployeeService, departmentEmployeeService>();
+            builder.Services.AddTransient<IStatusService, StatusService>();
+            builder.Services.AddTransient<IEmployeeService, EmployeeService>();
 
 
             var app = builder.Build();
