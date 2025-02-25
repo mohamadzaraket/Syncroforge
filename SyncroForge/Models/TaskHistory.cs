@@ -15,7 +15,7 @@ namespace SyncroForge.Models
         public int EmployeeId { get; set; }
         public virtual Employee Employee { get; set; }
         public string Type { get; set; }
-        public string value {  get; set; }  
+        public string Value {  get; set; }  
         public long CreatedAt { get; set; }
         public long UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
