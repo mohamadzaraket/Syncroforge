@@ -8,6 +8,7 @@ using SyncroForge.Services;
 using SyncroForge.Services.Company;
 using SyncroForge.Services.Guest;
 using SyncroForge.Services.Otp;
+using SyncroForge.Services.TaskService;
 using SyncroForge.Services.User;
 using System.Text;
 
@@ -63,6 +64,7 @@ namespace SyncroForge
             builder.Services.AddTransient<IDepartmentService, DepartmentService>();
             builder.Services.AddTransient<ICompanyService, CompanyService>();
             builder.Services.AddTransient<IUserService,UserService>();
+            builder.Services.AddTransient<ITaskService, TaskService>();
 
 
             var app = builder.Build();

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SyncroForge.Models;
 using SyncroForge.Requests.Comany;
 using SyncroForge.Requests.Department;
+using SyncroForge.Requests.Task;
 using SyncroForge.Responses;
-using SyncroForge.Services.Company;
+using SyncroForge.Services.TaskService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -15,15 +14,15 @@ namespace SyncroForge.Controllers
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class DepartmentController : ControllerBase
+    public class TaskController : ControllerBase
     {
-        private readonly IDepartmentService _DepartmentService;
-        public DepartmentController(IDepartmentService DepartmentService)
+        private readonly ITaskService _TaskService;
+        public TaskController(ITaskService TaskService)
         {
-            _DepartmentService = DepartmentService;
+            _TaskService = TaskService;
         }
         [HttpPost]
-        public async Task<IActionResult> AddDepartment([FromForm] AddDepartmentRequest request)
+        public async Task<IActionResult> AddDepartment([FromForm] AddTaskRequest request)
         {
             try
             {
@@ -38,7 +37,7 @@ namespace SyncroForge.Controllers
                 string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 int userId = int.Parse(userIdString);
 
-                MainResponse response = await _DepartmentService.AddDepartment(request ,userId ,publicId );
+                MainResponse response = await _TaskService.AddTask(request ,publicId,userId  );
                 return StatusCode(response.Status, response);
 
             }
@@ -48,13 +47,13 @@ namespace SyncroForge.Controllers
                 return StatusCode(400, new
                 {
                     status = 400,
-                    message = "error while adding department"
+                    message = "error while adding Task"
                 });
             }
 
         }
         [HttpGet]
-        public async Task<IActionResult> GetDepartments([FromQuery] GetDepartmentsRequest request)
+        public async Task<IActionResult> GetTasks()
         {
             try
             {
@@ -69,7 +68,7 @@ namespace SyncroForge.Controllers
                 string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 int userId = int.Parse(userIdString);
 
-                MainResponse response = await _DepartmentService.GetDepartments(request, userId, publicId);
+                MainResponse response = await _TaskService.GetTasks( userId, publicId);
                 return StatusCode(response.Status, response);
 
             }
@@ -79,14 +78,14 @@ namespace SyncroForge.Controllers
                 return StatusCode(400, new
                 {
                     status = 400,
-                    message = "error while geting departments"
+                    message = "error while geting tasks"
                 });
             }
 
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateDepartment([FromForm] UpdateDepartmentRequest request)
+        public async Task<IActionResult> UpdateTask([FromForm] UpdateTaskRequest request)
         {
             try
             {
@@ -101,7 +100,7 @@ namespace SyncroForge.Controllers
                 string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 int userId = int.Parse(userIdString);
 
-                MainResponse response = await _DepartmentService.UpdateDepartment(request, publicId, userId);
+                MainResponse response = await _TaskService.UpdateTask(request, publicId, userId);
                 return StatusCode(response.Status, response);
 
             }
@@ -111,7 +110,7 @@ namespace SyncroForge.Controllers
                 return StatusCode(400, new
                 {
                     status = 400,
-                    message = "error while Updating department"
+                    message = "error while Updating task"
                 });
             }
 
@@ -129,7 +128,7 @@ namespace SyncroForge.Controllers
                 return BadRequest(ModelState);
             }
 
-            MainResponse response = await _DepartmentService.GetDepartment(request ,id);
+            MainResponse response = await _TaskService.GetTask(request ,id);
             return StatusCode(response.Status, response);
 
         }
@@ -139,7 +138,7 @@ namespace SyncroForge.Controllers
             return StatusCode(400, new
             {
                 status = 400,
-                message = "error while geting  department"
+                message = "error while geting task"
             });
         }
 
