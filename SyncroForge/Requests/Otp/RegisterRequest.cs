@@ -2,6 +2,7 @@
 
 namespace SyncroForge.Requests.Otp
 {
+    
     public class RegisterRequest
     {
         [Required]

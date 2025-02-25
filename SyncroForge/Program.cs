@@ -20,13 +20,28 @@ namespace SyncroForge
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:3000")
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials(); // ? Required for WebSockets
+                    });
+            });
+
 
             // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.CustomSchemaIds(type => type.FullName); // Use fully qualified name to avoid conflicts
+            });
             Console.WriteLine("env:"+Env.currentEnvironment);
             builder.Configuration
            .SetBasePath(Directory.GetCurrentDirectory())
@@ -58,6 +73,7 @@ namespace SyncroForge
 
                 };
             });
+            builder.Services.AddSignalR();
             builder.Services.AddHttpClient();
             builder.Services.AddTransient<IGuestService, GuestService>();
             builder.Services.AddTransient<IOtpService, OtpService>();
@@ -69,6 +85,9 @@ namespace SyncroForge
 
 
             var app = builder.Build();
+
+            app.UseCors("AllowAll"); // ? Apply CORS Policy
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using SyncroForge.Data;
+using SyncroForge.Hubs;
 using SyncroForge.Models;
 using SyncroForge.Requests.Task;
 using SyncroForge.Responses;
@@ -10,8 +12,10 @@ namespace SyncroForge.Services.TaskService
     public class TaskService : ITaskService
     {
         private readonly AppDbContext _context;
-        public TaskService(AppDbContext context) {
+        private readonly IHubContext<TaskHub> _hubContext;
+        public TaskService(AppDbContext context, IHubContext<TaskHub> hubContext) {
             _context = context;
+            _hubContext= hubContext;
         }
 
         public async Task<MainResponse> AddTask(AddTaskRequest request, string userPublicKey, int userId)
@@ -215,6 +219,11 @@ namespace SyncroForge.Services.TaskService
             task.ParentTaskId = parentTask?.Id;
 
             await _context.SaveChangesAsync();
+            await _hubContext.Clients.Group(task.PublicKey).SendAsync("TaskUpdated", new
+            {
+                description = task.Description,
+                statusName = task.Status.Name,
+            });
 
             return new MainResponse()
             {
