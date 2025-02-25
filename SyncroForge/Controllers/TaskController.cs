@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SyncroForge.Requests.Comany;
-using SyncroForge.Requests.Department;
+using SyncroForge.Requests.Task;
 using SyncroForge.Requests.Task;
 using SyncroForge.Responses;
 using SyncroForge.Services.TaskService;
@@ -22,7 +22,7 @@ namespace SyncroForge.Controllers
             _TaskService = TaskService;
         }
         [HttpPost]
-        public async Task<IActionResult> AddDepartment([FromForm] AddTaskRequest request)
+        public async Task<IActionResult> AddTask([FromForm] AddTaskRequest request)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace SyncroForge.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetDepartment([FromQuery] GetDepartmentRequest request ,string id)
+        public async Task<IActionResult> GetTask([FromQuery] string id)
     {
         try
         {
@@ -128,7 +128,7 @@ namespace SyncroForge.Controllers
                 return BadRequest(ModelState);
             }
 
-            MainResponse response = await _TaskService.GetTask(request ,id);
+            MainResponse response = await _TaskService.GetTask(id);
             return StatusCode(response.Status, response);
 
         }
