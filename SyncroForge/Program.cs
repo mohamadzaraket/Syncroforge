@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
+using SyncroForge.Hubs;
 using SyncroForge.Services;
 using SyncroForge.Services.Company;
 using SyncroForge.Services.Guest;
@@ -80,6 +81,7 @@ namespace SyncroForge
 
 
             app.MapControllers();
+            app.MapHub<TaskHub>("/taskHub");
 
             app.Run();
         }
