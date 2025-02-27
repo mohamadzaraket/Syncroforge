@@ -22,17 +22,7 @@ namespace SyncroForge
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    policy =>
-                    {
-                        policy.WithOrigins("http://localhost:3000")
-                              .AllowAnyMethod()
-                              .AllowAnyHeader()
-                              .AllowCredentials(); // ? Required for WebSockets
-                    });
-            });
+
 
 
             // Add services to the container.
@@ -49,6 +39,17 @@ namespace SyncroForge
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             builder.Configuration.AddJsonFile($"appsettings.{Env.currentEnvironment}.json", optional: true, reloadOnChange: true);
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policy =>
+                    {
+                        policy.WithOrigins(builder.Configuration.GetSection("").Value)
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials(); // ? Required for WebSockets
+                    });
+            });
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddAuthorization();
             builder.Services.AddAuthentication(options =>
