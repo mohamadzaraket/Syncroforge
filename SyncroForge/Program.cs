@@ -44,7 +44,7 @@ namespace SyncroForge
                 options.AddPolicy("AllowAll",
                     policy =>
                     {
-                        policy.WithOrigins(builder.Configuration.GetSection("").Value)
+                        policy.WithOrigins(builder.Configuration.GetSection("Frontend:Url").Value)
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .AllowCredentials(); // ? Required for WebSockets
