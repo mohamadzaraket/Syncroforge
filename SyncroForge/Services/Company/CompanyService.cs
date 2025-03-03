@@ -553,5 +553,30 @@ namespace SyncroForge.Services.Company
 
 
         }
+
+        public async Task<MainResponse> SearchForCompany(SearchForCompanyRequest request)
+        {
+            var companies = await _context.Companies.Where(i => i.Name.Contains(request.Name)).Select(k => new
+            {
+                idenitifier = k.PublicKey,
+                Name = k.Name,
+                Description = k.Description,
+                logoUrl = k.Logo_Url,
+                CreatedAt = k.CreatedAt,
+                UpdatedAt = k.UpdatedAt
+            }).ToListAsync();
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "companies returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    companies = companies
+                }
+            };
+        }
     }
 }

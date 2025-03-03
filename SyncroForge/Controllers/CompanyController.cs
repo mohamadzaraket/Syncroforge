@@ -84,6 +84,31 @@ namespace SyncroForge.Controllers
             }
 
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchForCompany([FromQuery] SearchForCompanyRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                MainResponse response = await _companyService.SearchForCompany(request);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while adding company"
+                });
+            }
+
+        }
 
         [HttpPut]
         public async Task<IActionResult> UpdateCompany([FromForm] UpdateCompanyRequest request)

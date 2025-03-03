@@ -38,7 +38,8 @@ namespace SyncroForge.Services.User
                     identifier = k.Company.PublicKey,
                     logo = k.Company.Logo_Url,
                     name = k.Company.Name
-                }
+                },
+                status=k.status
 
             }).ToListAsync();
 
