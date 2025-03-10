@@ -210,7 +210,10 @@ namespace SyncroForge.Services.Company
                 };
             }
 
+            if(request.Name!= UpdatedDepartment.Name)
+            {
 
+        
             Department? findedDepartment = await _context.Departments.Where(i => i.Name == request.Name && i.Company.CreatedBy==userId && i.IsDeleted==false).FirstOrDefaultAsync();
 
             if (findedDepartment != null)
@@ -224,7 +227,7 @@ namespace SyncroForge.Services.Company
                     Type = "name conflict"
                 };
             }
-
+    }
 
 
 
