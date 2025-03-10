@@ -60,6 +60,26 @@ namespace SyncroForge.Services.User
             };
         }
 
+        public async Task<MainResponse> GetProfileInfo(int userId)
+        {
+            userr user = await _appDbContext.Users.Where(i => i.Id == userId).FirstOrDefaultAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                data = new
+                {
+                    name = $"{user.FirstName} {user.LastName}",
+                    email = user.Email,
+                    profilePhoto = user.ProfileUrl
+                },
+                Message="profile returned successfully",
+                Status=200,
+                Success=true,
+                Type="success"
+            };
+        }
+
         public async Task<MainResponse> JoinCompany(JoinCompanyRequest request,int userId,string publicUserId)
         {
             companny findedCompany = await _appDbContext.Companies.Include(i=>i.Employees).Where(j => j.PublicKey == request.CompanyIdentifier).FirstOrDefaultAsync();
