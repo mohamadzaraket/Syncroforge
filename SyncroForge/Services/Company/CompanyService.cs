@@ -438,8 +438,11 @@ namespace SyncroForge.Services.Company
                 {
                     identifier=k.User.PublicKey,
                     profile=k.User.ProfileUrl,
-                    email=k.User.Email
-                }
+                    email=k.User.Email,
+                    name=k.User.FirstName+" "+k.User.LastName,
+
+                },
+                status=k.status
  
             }).ToListAsync();
 

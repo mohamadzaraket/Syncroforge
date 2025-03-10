@@ -265,5 +265,30 @@ namespace SyncroForge.Services.User
 
 
         }
+
+        public async Task<MainResponse> SearchForUser(SearchForUserRequest request)
+        {
+            var users = await _appDbContext.Users
+                 .Where(i => (i.FirstName + " " + i.LastName).Contains(request.Name)) // FIX: Use + instead of interpolation
+                 .Select(k => new
+                 {
+                     identifier = k.PublicKey, // Fixed typo 'idenitifier' -> 'identifier'
+                     name = k.FirstName + " " + k.LastName, // Avoid string interpolation
+                     profileUrl = k.ProfileUrl
+                 })
+                 .ToListAsync();
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "users returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    users = users
+                }
+            };
+        }
     }
 }

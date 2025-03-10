@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SyncroForge.Requests.Comany;
 using SyncroForge.Requests.User;
 using SyncroForge.Responses;
 using SyncroForge.Services.User;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using GetInvitationsRequest = SyncroForge.Requests.User.GetInvitationsRequest;
+using ReplyForInviteRequest = SyncroForge.Requests.User.ReplyForInviteRequest;
 
 namespace SyncroForge.Controllers
 {
@@ -114,6 +117,31 @@ namespace SyncroForge.Controllers
                 {
                     status = 400,
                     message = "error while replying for invite"
+                });
+            }
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> SearchForUser([FromQuery] SearchForUserRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                MainResponse response = await _userService.SearchForUser(request);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while searching for user"
                 });
             }
 

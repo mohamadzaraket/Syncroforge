@@ -9,5 +9,6 @@ namespace SyncroForge.Services.User
         public Task<MainResponse> GetInvitations(GetInvitationsRequest request, int userId, string publicUserId);
         public Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request);
         public Task<MainResponse> GetProfileInfo(int userId);
+        public Task<MainResponse> SearchForUser(SearchForUserRequest request);
     }
 }
