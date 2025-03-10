@@ -336,7 +336,7 @@ namespace SyncroForge.Services.Company
                            
                            
                         }),
-                        Departments = department.Tasks?.Select(d => new
+                        Tasks = department.Tasks?.Select(d => new
                         {
                             d.PublicKey,
                             d.Description,

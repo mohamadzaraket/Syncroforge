@@ -165,11 +165,10 @@ namespace SyncroForge.Services.Company
                 };
             }
 
-       
 
-
-
-            UpdatedCompany.Name = request.Name;
+          //  if (UpdatedCompany.Name==request.Name && UpdatedCompany.Description == request.Description && UpdatedCompany.Logo_Url==request.CompanyLogo)
+           
+                UpdatedCompany.Name = request.Name;
             UpdatedCompany.Description = request.Description;
 
 
@@ -225,7 +224,7 @@ namespace SyncroForge.Services.Company
             companny? company=null;
         if (request.WithDepartment && request.WithEmployee)
             {
-              company = await _context.Companies.Include(i=>i.Employees).Include(i=>i.Departments).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+              company = await _context.Companies.Include(i=>i.Employees).ThenInclude(i=>i.User).Include(i=>i.Departments).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
  
             }else if(request.WithDepartment && request.WithEmployee==false)
             {
@@ -234,7 +233,7 @@ namespace SyncroForge.Services.Company
             }
             else if(request.WithDepartment==false && request.WithEmployee )
             {
-                company = await _context.Companies.Include(i => i.Employees).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+                company = await _context.Companies.Include(i => i.Employees).ThenInclude(i => i.User).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
 
             }
             else
@@ -274,9 +273,9 @@ namespace SyncroForge.Services.Company
                         Employees = company.Employees?.Select(e => new
                         {  
                             e.PublicKey,
-                            e.User.Email,
-                            e.User.FirstName,
-                            e.User.LastName,
+                            e.User?.Email,
+                            e.User?.FirstName,
+                            e.User?.LastName,
                            
                            
                         }),
