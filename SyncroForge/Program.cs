@@ -91,7 +91,8 @@ namespace SyncroForge
 
 
             var app = builder.Build();
-
+            app.Urls.Add("http://0.0.0.0:5000");
+            app.Urls.Add("https://0.0.0.0:7220"); // Allow HTTPS on port 7220
             app.UseCors("AllowAll"); // ? Apply CORS Policy
 
 
@@ -105,7 +106,7 @@ namespace SyncroForge
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseRouting();
 
             app.MapControllers();
             app.MapHub<TaskHub>("/taskHub");
