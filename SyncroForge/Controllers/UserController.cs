@@ -146,6 +146,27 @@ namespace SyncroForge.Controllers
             }
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetJoinedCompanies()
+        {
+            try
+            {
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+                MainResponse response = await _userService.GetJoinedCompanies(userId);
+                return StatusCode(response.Status, response);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while getting user joined companies"
+                });
+            }
+
+        }
 
 
 
