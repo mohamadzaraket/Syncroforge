@@ -6,5 +6,10 @@ namespace SyncroForge.Requests.Comany
     {
         [Required]
         public string Email { get; set; }
+
+        [Required(ErrorMessage = "Company Identifier is required.")]
+        [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          ErrorMessage = "Department Identifier must be a valid UUID.")]
+        public string DepartmentIdentifier { get; set; }
     }
 }

@@ -68,9 +68,22 @@ namespace SyncroForge.Services.EmployeeService
 
         public async Task<MainResponse> SearchForEmployee(SearchForEmployeeRequest request)
         {
+            Department? d =await _context.Departments.Where(i=>i.PublicKey== request.DepartmentIdentifier).FirstOrDefaultAsync();
+            if (d == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Status = 400,
+                    Message = "Department not found",
+                    Success = false,
+                    Type = "Conflict"
+
+                };
+            }
             var employees = await _context.Employees
        .Include(i => i.User)
-       .Where(i => i.User.Email.ToLower().Contains(request.Email.ToLower()))
+       .Where(i => i.User.Email.ToLower().Contains(request.Email.ToLower())&& i.CompanyId==d.CompanyId)
        .Select(k => new
        {
            identifier = k.PublicKey,
