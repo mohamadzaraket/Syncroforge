@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SyncroForge.Data;
 using SyncroForge.Models;
+using SyncroForge.Requests.Comany;
 using SyncroForge.Requests.EmployeeRequests;
 using SyncroForge.Responses;
 
@@ -63,6 +64,29 @@ namespace SyncroForge.Services.EmployeeService
 
 
 
+        }
+
+        public async Task<MainResponse> SearchForEmployee(SearchForEmployeeRequest request)
+        {
+            var employees = await _context.Employees.Include(i=>i.User).Where(i => i.User.Email.Contains(request.Email)).Select(k => new
+            {
+                idenitifier = k.PublicKey,
+                Name = k.User.Email,
+              
+               
+            }).ToListAsync();
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "companies returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    employees = employees
+                }
+            };
         }
     }
 }

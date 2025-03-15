@@ -104,7 +104,7 @@ namespace SyncroForge.Controllers
                 return StatusCode(400, new
                 {
                     status = 400,
-                    message = "error while adding company"
+                    message = "error while search for company"
                 });
             }
 

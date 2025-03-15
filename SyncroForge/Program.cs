@@ -106,7 +106,7 @@ namespace SyncroForge
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseRouting();
+          //  app.UseRouting();
 
             app.MapControllers();
             app.MapHub<TaskHub>("/taskHub");

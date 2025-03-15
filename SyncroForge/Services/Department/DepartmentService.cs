@@ -179,7 +179,7 @@ namespace SyncroForge.Services.Company
             {
                 Code = 200,
                 Status = 200,
-                Message = "companies returned successfully",
+                Message = "Departments returned successfully",
                 Type = "success",
                 Success = true,
                 data = new
@@ -264,9 +264,9 @@ namespace SyncroForge.Services.Company
             return new MainResponse()
             {
                 Code = 200,
-                Message = "Company updated successfully",
+                Message = "Department updated successfully",
                 Status = 200,
-                Type = "Company Update",
+                Type = "Department Update",
                 Success = true,
                 data = new
                 {
@@ -325,7 +325,7 @@ namespace SyncroForge.Services.Company
                 Success = true,
                 data = new
                 {
-                    company = new
+                    department = new
                     {
                         department.PublicKey,
                         department.Name,
@@ -335,9 +335,12 @@ namespace SyncroForge.Services.Company
                         Employees = department.DepartmentEmployees?.Select(e => new
                         {  
                             e.PublicKey,
-                            e.Employee.User
-                           
-                           
+                            e.Employee.User.Id,
+                            e.Employee.User.FirstName,
+                            e.Employee.User.LastName,
+                            e.Employee.User.Email
+
+
                         }),
                         Tasks = department.Tasks?.Select(d => new
                         {
