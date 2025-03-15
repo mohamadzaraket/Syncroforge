@@ -21,7 +21,7 @@ namespace SyncroForge.Controllers
             _departmentEmployeeService = departmentEmployeeService;
         }
         [HttpPost]
-        public async Task<IActionResult> AssignEmployeeToDepartment([FromForm] DepartmentEmployeeRequest request)
+        public async Task<IActionResult> AssignEmployeeToDepartment([FromBody] DepartmentEmployeeRequest request)
         {
             try
             {

@@ -8,7 +8,7 @@ using SyncroForge.Services.EmployeeService;
 
 namespace SyncroForge.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class EmployeeController : ControllerBase
@@ -57,7 +57,7 @@ namespace SyncroForge.Controllers
                 return StatusCode(400, new
                 {
                     status = 400,
-                    message = "error while adding company"
+                    message = "error while searching employee"
                 });
             }
 

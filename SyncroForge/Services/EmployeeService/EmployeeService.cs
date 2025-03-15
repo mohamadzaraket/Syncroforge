@@ -68,18 +68,22 @@ namespace SyncroForge.Services.EmployeeService
 
         public async Task<MainResponse> SearchForEmployee(SearchForEmployeeRequest request)
         {
-            var employees = await _context.Employees.Include(i=>i.User).Where(i => i.User.Email.Contains(request.Email)).Select(k => new
-            {
-                idenitifier = k.PublicKey,
-                Name = k.User.Email,
-              
-               
-            }).ToListAsync();
+            var employees = await _context.Employees
+       .Include(i => i.User)
+       .Where(i => i.User.Email.ToLower().Contains(request.Email.ToLower()))
+       .Select(k => new
+       {
+           identifier = k.PublicKey,
+           Name = k.User.Email,
+           Logo = k.User.ProfileUrl,
+       })
+       .ToListAsync();
+
             return new MainResponse()
             {
                 Code = 200,
                 Status = 200,
-                Message = "companies returned successfully",
+                Message = "employees returned successfully",
                 Type = "success",
                 Success = true,
                 data = new
