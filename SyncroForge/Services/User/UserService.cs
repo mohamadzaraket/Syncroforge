@@ -60,6 +60,43 @@ namespace SyncroForge.Services.User
             };
         }
 
+        public async Task<MainResponse> GetJoinedCompanies(int userId)
+        {
+            userr user = await _appDbContext.Users.Include(i=>i.Employees).ThenInclude(j=>j.Company).Where(k => k.Id == userId).FirstOrDefaultAsync();
+            List<Employee> employees = user.Employees.ToList();
+            List<object> companies = [];
+            for(int i = 0; i < employees.Count; i++)
+            {
+                companies.Add(new
+                {
+                    idenitifier = employees[i].Company.PublicKey,
+                    Name = employees[i].Company.Name,
+                    Description = employees[i].Company.Description,
+                    logoUrl = employees[i].Company.Logo_Url,
+                    CreatedAt = employees[i].Company.CreatedAt,
+                    UpdatedAt = employees[i].Company.UpdatedAt
+
+                });
+            }
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "joined companies returned success",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    totalCompanies = companies.Count,
+                    companies = companies
+                }
+            };
+
+
+
+            
+        }
+
         public async Task<MainResponse> GetProfileInfo(int userId)
         {
             userr user = await _appDbContext.Users.Where(i => i.Id == userId).FirstOrDefaultAsync();
