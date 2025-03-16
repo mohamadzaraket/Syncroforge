@@ -265,6 +265,7 @@ namespace SyncroForge.Services.Company
                 {
                     company = new
                     {
+                        company.Id,
                         company.PublicKey,
                         company.Name,
                         company.Logo_Url,
@@ -577,6 +578,53 @@ namespace SyncroForge.Services.Company
                 data = new
                 {
                     companies = companies
+                }
+            };
+        }
+        public async Task<MainResponse> SearchForEmployee(SearchForEmployeeInCompanyRequest request)
+        {
+            companny company = await _context.Companies.Where(k => k.PublicKey == request.CompanyIdentifier).FirstOrDefaultAsync();
+            if (company == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Status = 400,
+                    Message = "company not found",
+                    Success = false,
+                    Type = "Conflict"
+
+                };
+            }
+            List<Employee> employees = await _context.Employees.Include(i => i.User).Where(i => i.CompanyId == company.Id).ToListAsync();
+
+
+            var searchedEmployees=employees.Where(i=>i.User.Email.Contains(request.Email)).Select(k => new
+            {
+                id=k.Id,
+                identifier = k.PublicKey,
+                Email = k.User.Email,
+                Name = k.User.FirstName + " " + k.User.LastName,
+                Logo = k.User.ProfileUrl,
+            }).ToList();
+
+
+
+
+
+
+
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "employees returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+                    employees = searchedEmployees
                 }
             };
         }

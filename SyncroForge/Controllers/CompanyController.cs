@@ -235,6 +235,26 @@ namespace SyncroForge.Controllers
                 });
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchForEmployee([FromQuery] SearchForEmployeeInCompanyRequest request)
+        {
+            try
+            {
+                MainResponse response = await _companyService.SearchForEmployee(request);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while replying for invite"
+                });
+            }
+        }
+
 
     }
   }
