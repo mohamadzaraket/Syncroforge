@@ -88,7 +88,7 @@ namespace SyncroForge
             builder.Services.AddTransient<IStatusService, StatusService>();
             builder.Services.AddTransient<IEmployeeService, EmployeeService>();
             builder.Services.AddTransient<ITaskService, TaskService>();
-
+            builder.Services.AddTransient<IAttendanceService, AttendanceService>();
 
             var app = builder.Build();
             app.Urls.Add("http://0.0.0.0:5000");
