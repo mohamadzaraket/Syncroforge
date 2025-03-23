@@ -357,5 +357,55 @@ namespace SyncroForge.Services.Company
 
 
         }
+        public async Task<MainResponse> GetDepartmentUser(GetDepartmentUserRequest request, string userPublicKey, int userId)
+        {
+            companny company = await _context.Companies.Include(i=>i.Departments).Where(i=>i.PublicKey==request.CompanyId).FirstOrDefaultAsync();
+            if (company == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "Company dose not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            }
+            Employee? employee = await _context.Employees.Include(i=>i.DepartmentEmployees).ThenInclude(i=>i.Department).Where(i=>i.UserId==userId && i.CompanyId== company.Id).FirstOrDefaultAsync();
+            if(employee == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "Employee dose not exist",
+                    Status = 400,
+                    Success = false,
+                    Type = "Not found"
+                };
+            }
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Message = "Departments returned successfully",
+                Type = "success",
+                Success = true,
+                data = new
+                {
+           
+                    Departments = employee?.DepartmentEmployees.Select(
+                        de => new
+                        {
+                        Identifier=de.Department.PublicKey,
+                        name=de.Department.Name,
+                         Logo = de.Department.Logo,
+                        }).ToList()
+                }
+            };
+
+        }
+        
+
+
     }
 }
