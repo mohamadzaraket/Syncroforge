@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
 using SyncroForge.Hubs;
 using SyncroForge.Services;
+using SyncroForge.Services.AttachmentsService;
 using SyncroForge.Services.Company;
 using SyncroForge.Services.EmployeeService;
 using SyncroForge.Services.Guest;
@@ -89,6 +90,7 @@ namespace SyncroForge
             builder.Services.AddTransient<IEmployeeService, EmployeeService>();
             builder.Services.AddTransient<ITaskService, TaskService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
+            builder.Services.AddTransient<IAttachmentService, AttachmentService>();
 
             var app = builder.Build();
             app.Urls.Add("http://0.0.0.0:5000");

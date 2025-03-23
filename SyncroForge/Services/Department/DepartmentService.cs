@@ -10,6 +10,7 @@ using System.Text.Json;
 using companny = SyncroForge.Models.Company;
 
 
+
 namespace SyncroForge.Services.Company
 {
     public class DepartmentService : IDepartmentService
@@ -354,6 +355,58 @@ namespace SyncroForge.Services.Company
                     }
                 }
             };
+
+
+        }
+
+        public async Task<MainResponse> GetTasksForEmployeeInsideDepartment(GetTasksForEmployeeInsideDepartmentRequest request, int userId)
+        {
+            
+            Department department = await _context.Departments.Include(j=>j.DepartmentEmployees).ThenInclude(k=>k.Employee).Where(j => j.PublicKey == request.DepartmentId).FirstOrDefaultAsync();
+            if (department == null)
+            {
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Status = 400,
+                    Success = false,
+                    Message = "department not found",
+                    Type = "false"
+                };
+            }
+            List<DepartmentEmployee> employees = department.DepartmentEmployees.ToList();
+
+            DepartmentEmployee employee = employees.Where(i => i.Employee.UserId == userId).FirstOrDefault();
+
+            if (employee == null)
+            {
+
+                return new MainResponse()
+                {
+                    Code = 400,
+                    Status = 400,
+                    Success = false,
+                    Message = "you dont have access to this department",
+                    Type = "false"
+                };
+
+            }
+            List<Models.Task> employeeTasks = await _context.Tasks.Include(i=>i.SubTasks).Include(j=>j.ParentTask).Include(k=>k.Creator).Include(l=>l.Assignee).Include(m=>m.Status).Where(i => i.DepartmentId == department.Id && i.AssigneeId == employee.EmployeeId).ToListAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Status = 200,
+                Success = true,
+                data = new
+                {
+                    tasks = employeeTasks
+                },
+                Message = "tasks returned successfully"
+            };
+
+            
+            
 
 
         }

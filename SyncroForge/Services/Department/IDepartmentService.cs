@@ -11,6 +11,7 @@ namespace SyncroForge.Services.Company
         public Task<MainResponse> GetDepartments(GetDepartmentsRequest request, int userId, string userPublicKey);
         public Task<MainResponse> UpdateDepartment(UpdateDepartmentRequest request, string userPublicKey, int userId);
         public Task<MainResponse> GetDepartment(GetDepartmentRequest request, String id);
+        public Task<MainResponse> GetTasksForEmployeeInsideDepartment(GetTasksForEmployeeInsideDepartmentRequest request, int userId);
 
     }
 }
