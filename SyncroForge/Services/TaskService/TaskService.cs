@@ -89,7 +89,7 @@ namespace SyncroForge.Services.TaskService
 
         public async Task<MainResponse> GetTask(string id)
         {
-           Task? task =await _context.Tasks.Include(i=>i.SubTasks).Include(i=>i.Assignee).Where(i=>i.PublicKey == id).FirstOrDefaultAsync();
+           Task? task =await _context.Tasks.Include(i=>i.SubTasks).ThenInclude(i=>i.Status).Include(i => i.SubTasks).ThenInclude(i=>i.Creator).Include(i => i.SubTasks).ThenInclude(i => i.Assignee).ThenInclude(i=>i.User). Include(i=>i.Assignee).ThenInclude(i=>i.User). Include(i=>i.Creator).Include(i=>i.Status).Include(i=>i.ParentTask).Where(i=>i.PublicKey == id).FirstOrDefaultAsync();
             if(task == null)
             {
                 return new MainResponse()
@@ -110,7 +110,42 @@ namespace SyncroForge.Services.TaskService
                 Status = 200,
                 Success = true,
                 Type = "success",
-                data = task,
+                data = new
+                {
+                    summary=task.Summary,
+                    description=task.Description,
+                    assignee=new { 
+                    email=task.Assignee.User.Email,
+                    profileUrl=task.Assignee.User.ProfileUrl
+                    },
+                    creator=new
+                    {
+                        email=task.Creator.Email,
+                        profileUrl=task.Creator.ProfileUrl
+                    },
+                    subtasks = task.SubTasks.Select(e =>new
+                    {
+                        summary=e.Summary,
+                        description=e.Description,
+                        status=new
+                        {
+                            name=e.Status.Name,
+                            color=e.Status.Color,
+                            backgroundColor=e.Status.BackgroundColor,
+                        },
+                        assignee = new
+                        {
+                            email = e.Assignee.User.Email,
+                            profileUrl = e.Assignee.User.ProfileUrl
+                        },
+                        creator = new
+                        {
+                            email = e.Creator.Email,
+                            profileUrl = e.Creator.ProfileUrl
+                        },
+
+                    })
+                },
             };
         }
 

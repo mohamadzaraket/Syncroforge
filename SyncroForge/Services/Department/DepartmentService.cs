@@ -287,11 +287,11 @@ namespace SyncroForge.Services.Company
             Department? department = null;
         if (request.WithTask && request.WithEmployee)
             {
-                department = await _context.Departments.Include(i=>i.DepartmentEmployees).ThenInclude(i=>i.Employee).ThenInclude(i => i.User).Include(i=>i.Tasks).ThenInclude(i=>i.Status).Include(i => i.Tasks).ThenInclude(t => t.SubTasks).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+                department = await _context.Departments.Include(i=>i.DepartmentEmployees).ThenInclude(i=>i.Employee).ThenInclude(i => i.User).Include(i=>i.Tasks).ThenInclude(i=>i.Status).Include(i => i.Tasks).ThenInclude(t => t.Assignee).ThenInclude(t => t.User).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
  
             }else if(request.WithTask && request.WithEmployee==false)
             {
-                department = await _context.Departments.Include(i => i.Tasks).ThenInclude(t => t.Status).Include(i=>i.Tasks).ThenInclude(t=>t.SubTasks). Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+                department = await _context.Departments.Include(i => i.Tasks).ThenInclude(t => t.Status).Include(i=>i.Tasks).ThenInclude(t=>t.Assignee).ThenInclude(t=>t.User).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
 
             }
             else if(request.WithTask==false && request.WithEmployee )
@@ -347,24 +347,20 @@ namespace SyncroForge.Services.Company
                         {
                             d.PublicKey,
                             d.Description,
-                            d.ParentTaskId,
-                            d.CreatedById,
+                            d.Summary,
+  
                             status=new
                             {
-                                name=d.Status.Name
+                                name=d.Status.Name,
+                                color=d.Status.Color,
+                                backgroundColor=d.Status.BackgroundColor
                             },
-                            subTasks=d.SubTasks.Select(e=>new
+                            assignee=new
                             {
-                                e.PublicKey,
-                                e.Description,
-                                e.Summary,
-                                status=new
-                                {
-                                    name=e.Status.Name,
-                                    color=e.Status.Color,
-                                    backgroundColor=e.Status.BackgroundColor
-                                }
-                            })
+                                d.Assignee.User.Email,
+                                d.Assignee.User.ProfileUrl
+                            }
+
                             
                         }),
                     }
@@ -456,7 +452,7 @@ namespace SyncroForge.Services.Company
                 };
 
             }
-            List<Models.Task> employeeTasks = await _context.Tasks.Include(i=>i.SubTasks).Include(j=>j.ParentTask).Include(k=>k.Creator).Include(l=>l.Assignee).Include(m=>m.Status).Where(i => i.DepartmentId == department.Id && i.AssigneeId == employee.EmployeeId).ToListAsync();
+            List<Models.Task> employeeTasks = await _context.Tasks.Include(m=>m.Status).Where(i => i.DepartmentId == department.Id && i.AssigneeId == employee.EmployeeId).ToListAsync();
 
             return new MainResponse()
             {
@@ -465,31 +461,20 @@ namespace SyncroForge.Services.Company
                 Success = true,
                 data = new
                 {
-                    tasks = employeeTasks.Select(d=>new
+                    tasks = employeeTasks.Select(d => new
                     {
                         d.PublicKey,
                         d.Description,
-                        d.ParentTaskId,
-                        d.CreatedById,
+                        d.Summary,
+
                         status = new
                         {
-                            name = d.Status.Name
-                        },
-                        subTasks = d.SubTasks.Select(e => new
-                        {
-                            e.PublicKey,
-                            e.Description,
-                            e.Summary,
-                            status = new
-                            {
-                                name = e.Status.Name,
-                                color = e.Status.Color,
-                                backgroundColor = e.Status.BackgroundColor
-                            }
-                        })
+                            name = d.Status.Name,
+                            color=d.Status.Color,
+                            backgroundColor=d.Status.BackgroundColor,
+                        }
 
-                    })
-                },
+                    })},
                 Message = "tasks returned successfully"
             };
 

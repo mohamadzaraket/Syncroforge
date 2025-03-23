@@ -119,7 +119,7 @@ namespace SyncroForge.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTask([FromQuery] string id)
+        public async Task<IActionResult> GetTask(string id)
     {
         try
         {
