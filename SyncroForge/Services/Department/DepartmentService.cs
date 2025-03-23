@@ -287,11 +287,11 @@ namespace SyncroForge.Services.Company
             Department? department = null;
         if (request.WithTask && request.WithEmployee)
             {
-                department = await _context.Departments.Include(i=>i.DepartmentEmployees).ThenInclude(i=>i.Employee).ThenInclude(i => i.User).Include(i=>i.Tasks).ThenInclude(i=>i.Status).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+                department = await _context.Departments.Include(i=>i.DepartmentEmployees).ThenInclude(i=>i.Employee).ThenInclude(i => i.User).Include(i=>i.Tasks).ThenInclude(i=>i.Status).Include(i => i.Tasks).ThenInclude(t => t.SubTasks).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
  
             }else if(request.WithTask && request.WithEmployee==false)
             {
-                department = await _context.Departments.Include(i => i.Tasks).ThenInclude(i => i.Status).Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
+                department = await _context.Departments.Include(i => i.Tasks).ThenInclude(t => t.Status).Include(i=>i.Tasks).ThenInclude(t=>t.SubTasks). Where(i => i.PublicKey == id && i.IsDeleted == false).FirstOrDefaultAsync();
 
             }
             else if(request.WithTask==false && request.WithEmployee )
@@ -335,7 +335,7 @@ namespace SyncroForge.Services.Company
                        
                         Employees = department.DepartmentEmployees?.Select(e => new
                         {  
-                            e.PublicKey,
+                            e.Employee.PublicKey,
                             e.Employee.User.Id,
                             e.Employee.User.FirstName,
                             e.Employee.User.LastName,
@@ -349,7 +349,22 @@ namespace SyncroForge.Services.Company
                             d.Description,
                             d.ParentTaskId,
                             d.CreatedById,
-                            d.Status.Name,
+                            status=new
+                            {
+                                name=d.Status.Name
+                            },
+                            subTasks=d.SubTasks.Select(e=>new
+                            {
+                                e.PublicKey,
+                                e.Description,
+                                e.Summary,
+                                status=new
+                                {
+                                    name=e.Status.Name,
+                                    color=e.Status.Color,
+                                    backgroundColor=e.Status.BackgroundColor
+                                }
+                            })
                             
                         }),
                     }
@@ -450,7 +465,30 @@ namespace SyncroForge.Services.Company
                 Success = true,
                 data = new
                 {
-                    tasks = employeeTasks
+                    tasks = employeeTasks.Select(d=>new
+                    {
+                        d.PublicKey,
+                        d.Description,
+                        d.ParentTaskId,
+                        d.CreatedById,
+                        status = new
+                        {
+                            name = d.Status.Name
+                        },
+                        subTasks = d.SubTasks.Select(e => new
+                        {
+                            e.PublicKey,
+                            e.Description,
+                            e.Summary,
+                            status = new
+                            {
+                                name = e.Status.Name,
+                                color = e.Status.Color,
+                                backgroundColor = e.Status.BackgroundColor
+                            }
+                        })
+
+                    })
                 },
                 Message = "tasks returned successfully"
             };

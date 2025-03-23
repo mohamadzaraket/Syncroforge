@@ -68,7 +68,11 @@ namespace SyncroForge.Services.TaskService
             task.Summary=request.Summary;
             task.Description=request.Description;   
             task.StatusId = status.Id;
-            task.ParentTaskId = taskk.Id;
+            if (taskk != null) {
+                task.ParentTaskId = taskk.Id;
+            }
+            await _context.Tasks.AddAsync(task);
+         
 
           await  _context.SaveChangesAsync();
 
