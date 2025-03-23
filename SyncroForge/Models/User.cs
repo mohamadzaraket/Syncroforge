@@ -24,6 +24,7 @@ namespace SyncroForge.Models
         public virtual ICollection< Employee> Employees { get; set; }
         public virtual ICollection< Company> CreatedCompanies { get; set; }
         public virtual ICollection<CompanyInviteUser> Invites {  get; set; }
+        public virtual ICollection<Task> CreatedTasks { get; set; }
 
         public User()
         {

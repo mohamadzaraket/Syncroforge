@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SyncroForge.Data;
 using SyncroForge.Hubs;
+using SyncroForge.Mapper;
 using SyncroForge.Services;
 using SyncroForge.Services.AttachmentsService;
 using SyncroForge.Services.Company;
@@ -77,6 +78,7 @@ namespace SyncroForge
 
                 };
             });
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddSignalR();
             builder.Services.AddHttpClient();
             builder.Services.AddTransient<IGuestService, GuestService>();

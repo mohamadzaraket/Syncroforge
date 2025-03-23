@@ -24,7 +24,6 @@ namespace SyncroForge.Models
 
         public virtual ICollection<DepartmentEmployee> DepartmentEmployees { get; set; }
         public virtual ICollection<TaskHistory> TaskHistories { get; set; }
-        public virtual ICollection<Task> CreatedTasks { get; set; }
         public virtual ICollection<Task> AssignedTasks { get; set; }
         public virtual ICollection<Attendance> Attendances { get; set; }
 
