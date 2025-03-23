@@ -1,4 +1,5 @@
-﻿using SyncroForge.Responses;
+﻿using Azure.Core;
+using SyncroForge.Responses;
 
 namespace SyncroForge.Services.AttachmentsService
 {
@@ -30,6 +31,35 @@ namespace SyncroForge.Services.AttachmentsService
 
             
             
+        }
+        public async Task<MainResponse> ADDAttachmet(IFormFile attachment)
+        {
+            try
+            {
+
+                string url = $"{Guid.NewGuid().ToString()}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                using var stream = attachment.OpenReadStream();
+                string path = await _minoService.UploadFileAsync(stream, url);
+                return new MainResponse()
+                {
+                    Code = 200,
+                    Message = "attachment Added success",
+                    Success = true,
+                    Type = "Add",
+                    Status = 200,
+                    data = new {
+                        URL= path,
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+
         }
     }
 }

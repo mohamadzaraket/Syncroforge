@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SyncroForge.Requests.Attachmet;
 using SyncroForge.Responses;
 using SyncroForge.Services.AttachmentsService;
 
@@ -33,6 +34,26 @@ namespace SyncroForge.Controllers
                 {
                     status = 400,
                     message = "error while deleting attachment"
+                });
+            }
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> ADDAttachmet([FromForm] ADDAttachmetRequest request)
+        {
+            try
+            {
+                MainResponse response = await _attachmentService.ADDAttachmet(request.file);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while adding attachment"
                 });
             }
 
