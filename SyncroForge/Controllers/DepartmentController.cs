@@ -145,6 +145,34 @@ namespace SyncroForge.Controllers
 
     }
         [HttpGet]
+        public async Task<IActionResult> GetDepartmentUser([FromQuery] GetDepartmentUserRequest request)
+        {
+            try
+            {
+              
+                string token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                string publicId = jwtToken.Claims.FirstOrDefault(c => c.Type == "publicId")?.Value;
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+
+                MainResponse response = await _DepartmentService.GetDepartmentUser(request, publicId, userId);
+                return StatusCode(response.Status, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while Updating department"
+                });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetTasksForEmployeeInsideDepartment([FromQuery] GetTasksForEmployeeInsideDepartmentRequest request)
         {
             try
@@ -169,4 +197,4 @@ namespace SyncroForge.Controllers
             }
         }
 }
-  }
+}
