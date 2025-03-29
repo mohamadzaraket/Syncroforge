@@ -339,7 +339,8 @@ namespace SyncroForge.Services.Company
                             e.Employee.User.Id,
                             e.Employee.User.FirstName,
                             e.Employee.User.LastName,
-                            e.Employee.User.Email
+                            e.Employee.User.Email,
+                            e.Employee.User.ProfileUrl
 
 
                         }),
