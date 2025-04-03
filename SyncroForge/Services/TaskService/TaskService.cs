@@ -114,6 +114,12 @@ namespace SyncroForge.Services.TaskService
                 {
                     summary=task.Summary,
                     description=task.Description,
+                    status=new
+                    {
+                        name = task.Status.Name,
+                        color = task.Status.Color,
+                        backgroundColor = task.Status.BackgroundColor,
+                    },
                     assignee=new { 
                     email=task.Assignee.User.Email,
                     profileUrl=task.Assignee.User.ProfileUrl
@@ -121,7 +127,8 @@ namespace SyncroForge.Services.TaskService
                     creator=new
                     {
                         email=task.Creator.Email,
-                        profileUrl=task.Creator.ProfileUrl
+                        profileUrl=task.Creator.ProfileUrl,
+                        creatorId= task.Creator.Id
                     },
                     subtasks = task.SubTasks.Select(e =>new
                     {
