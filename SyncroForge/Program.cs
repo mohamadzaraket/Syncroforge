@@ -109,6 +109,13 @@ namespace SyncroForge
             builder.Services.AddTransient<ITaskService, TaskService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
             builder.Services.AddTransient<IAttachmentService, AttachmentService>();
+            builder.Services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole(); // ? Log to console
+            builder.Logging.SetMinimumLevel(LogLevel.Debug); // ? Log all levels
 
             var app = builder.Build();
             app.Urls.Add("http://0.0.0.0:5000");

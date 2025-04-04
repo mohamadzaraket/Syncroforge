@@ -8,11 +8,13 @@ namespace SyncroForge.Hubs
     {
         public override Task OnConnectedAsync()
         {
-            
+            Console.WriteLine($"✅ User connected: {Context.UserIdentifier}");
+
             return base.OnConnectedAsync();
         }
         public override Task OnDisconnectedAsync(Exception? exception)
         {
+            Console.WriteLine($"✅ User disconnected: {Context.UserIdentifier}");
             return base.OnDisconnectedAsync(exception);
         }
         
@@ -39,8 +41,8 @@ namespace SyncroForge.Hubs
 
                 await Clients.User(targetUserId).SendAsync("ReceiveCallRequest", new
                 {
-                    CallPath = CallPath,
-                    FromUser = Context.UserIdentifier
+                    callPath = CallPath,
+                    fromUser = Context.UserIdentifier
                 });
 
                 Console.WriteLine("✅ Call request sent.");
@@ -54,9 +56,10 @@ namespace SyncroForge.Hubs
 
         public async Task AcceptCallUser(string targetUserId, String CallPath)
         {
+            Console.WriteLine($"➡️ accepting userId: {targetUserId} with path: {CallPath}");
             await Clients.User(targetUserId).SendAsync("AcceptCallRequest", new
             {
-                CallPath = CallPath
+                callPath = CallPath
             });
         }
     }
