@@ -97,6 +97,7 @@ namespace SyncroForge
             var app = builder.Build();
             app.Urls.Add("http://0.0.0.0:5000");
             app.Urls.Add("https://0.0.0.0:7220"); // Allow HTTPS on port 7220
+            app.Urls.Add("https://kadesktop.local:7220");
             app.UseCors("AllowAll"); // ? Apply CORS Policy
 
 
