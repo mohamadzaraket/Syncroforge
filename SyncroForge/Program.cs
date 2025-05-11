@@ -77,6 +77,22 @@ namespace SyncroForge
 
 
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // If the request is for our hub...
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddSignalR();
@@ -93,6 +109,13 @@ namespace SyncroForge
             builder.Services.AddTransient<ITaskService, TaskService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
             builder.Services.AddTransient<IAttachmentService, AttachmentService>();
+            builder.Services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole(); // ? Log to console
+            builder.Logging.SetMinimumLevel(LogLevel.Debug); // ? Log all levels
 
             var app = builder.Build();
             app.Urls.Add("http://0.0.0.0:5000");
@@ -115,6 +138,7 @@ namespace SyncroForge
 
             app.MapControllers();
             app.MapHub<TaskHub>("/taskHub");
+            app.MapHub<ChatHub>("/chatHub");
 
             app.Run();
         }
