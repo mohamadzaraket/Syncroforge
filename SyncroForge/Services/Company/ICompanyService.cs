@@ -16,6 +16,8 @@ namespace SyncroForge.Services.Company
         public Task<MainResponse> ReplyForInvite(ReplyForInviteRequest request);
         public Task<MainResponse> SearchForCompany(SearchForCompanyRequest request);
         public Task<MainResponse> SearchForEmployee(SearchForEmployeeInCompanyRequest request);
+        public Task<MainResponse> PaySalary(PaySalaryRequest request,int userId);
+        public Task<MainResponse> GetSalaries(GetSalariesRequest request, int userId);
 
     }
 }

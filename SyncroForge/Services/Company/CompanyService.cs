@@ -628,5 +628,104 @@ namespace SyncroForge.Services.Company
                 }
             };
         }
+
+        public async Task<MainResponse> PaySalary(PaySalaryRequest request, int userId)
+        {
+            if (request.AreIdentifiersValidUuids(out var invalidIds))
+            {
+                userr user = await _context.Users.Include(j => j.CreatedCompanies).Where(i => i.Id == userId).FirstOrDefaultAsync();
+                List<int> companiesIds = user.CreatedCompanies.Select(company => company.Id).ToList();
+                List<Employee> employees = await _context.Employees.Where(i => companiesIds.Contains(i.CompanyId) && request.employeesIdentifiers.Contains(i.PublicKey)).ToListAsync();
+                if (employees.Count < request.employeesIdentifiers.Count)
+                {
+                    return new MainResponse()
+                    {
+                        Code = 400,
+                        Status = 400,
+                        Success = false,
+                        Type = "fail",
+                        Message = "invalid employee identifiers"
+                    };
+                }
+                List<Salary> salaries = new List<Salary>();
+                foreach(Employee employee in employees)
+                {
+                    salaries.Add(new Salary()
+                    {
+                        EmployeeId = employee.Id,
+                        Ammount = request.amount
+                    });
+                }
+
+                await _context.Salaries.AddRangeAsync(salaries);
+                await _context.SaveChangesAsync();
+                return new MainResponse()
+                {
+                    Code = 200,
+                    Status = 200,
+                    Success = true,
+                    Type = "success",
+                    Message = "bulk payment created success"
+                };
+
+
+            }
+
+            return new MainResponse()
+                {
+                    Code = 400,
+                    Message = "Invalid UUIDs: " + string.Join(", ", invalidIds),
+                    Status = 400
+                };
+
+            
+        }
+
+        public async Task<MainResponse> GetSalaries(GetSalariesRequest request, int userId)
+        {
+            companny company=await _context.Companies.Where(i=>i.CreatedBy== userId && i.PublicKey==request.companyId).FirstOrDefaultAsync();
+            if (company == null)
+            {
+                return new MainResponse()
+                {
+                    Status = 400,
+                    Code = 400,
+                    Message = "company not found",
+                    Success = false,
+                    Type = "not found"
+                };
+            }
+            List<Employee> employees = await _context.Employees.Include(i=>i.Salaries).Include(i=>i.User). Where(i => i.CompanyId == company.Id).ToListAsync();
+            List<object> salaries = new List<object>();
+            foreach(Employee em in employees)
+            {
+                foreach (Salary sal in em.Salaries) {
+                    salaries.Add(new
+                    {
+                        firstName = em.User.FirstName,
+                        lastName = em.User.LastName,
+                        email = em.User.Email,
+                        amount = sal.Ammount,
+                        createdAt = sal.CreatedAt,
+                        publicKey=sal.PublicKey
+
+                    });
+                        }
+
+            }
+            salaries = salaries
+    .OrderByDescending(s => Convert.ToInt64(s.GetType().GetProperty("createdAt").GetValue(s)))
+    .ToList();
+            return new MainResponse()
+            {
+                Code = 200,
+                data = salaries,
+                Message = "salaries returned success",
+                Status = 200,
+                Success = true,
+                Type = "Get"
+            };
+
+        }
     }
 }

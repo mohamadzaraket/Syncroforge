@@ -254,6 +254,47 @@ namespace SyncroForge.Controllers
                 });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> PaySalary([FromBody] PaySalaryRequest request)
+        {
+            try
+            {
+
+
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+                MainResponse response = await _companyService.PaySalary(request,userId);
+                return StatusCode(response.Status, response);
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while paying salary"
+                });
+            }
+
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetSalaries([FromQuery]  GetSalariesRequest request)
+        {
+            try
+            {
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
+                MainResponse Response=await _companyService.GetSalaries(request,userId);
+                return StatusCode(Response.Status, Response);
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(400, new
+                {
+                    status = 400,
+                    message = "error while getting salaries"
+                });
+            }
+        }
 
 
     }

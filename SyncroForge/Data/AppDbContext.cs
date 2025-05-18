@@ -46,6 +46,7 @@ namespace SyncroForge.Data
             modelBuilder.Entity<CompanyInviteUser>().HasOne(i=>i.Company).WithMany(j=>j.invitedUsers).HasForeignKey(k=>k.CompanyId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<CompanyInviteUser>().HasOne(i => i.User).WithMany(j => j.Invites).HasForeignKey(k => k.UserId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Attendance>().HasOne(i=>i.Employee).WithMany(j=>j.Attendances).HasForeignKey(k=>k.EmployeeId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Salary>().HasOne(i => i.Employee).WithMany(j => j.Salaries).HasForeignKey(k => k.EmployeeId).OnDelete(DeleteBehavior.NoAction);
 
 
 
@@ -64,6 +65,7 @@ namespace SyncroForge.Data
         public DbSet<Status> Statuses { get; set; }
         public DbSet<CompanyInviteUser> CompaniesInviteduser { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<Salary> Salaries { get; set; }
 
 
     }
