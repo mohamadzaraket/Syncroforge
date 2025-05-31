@@ -6,6 +6,7 @@ using SyncroForge.Responses;
 using System.Text.Json;
 using companny = SyncroForge.Models.Company;
 using userr = SyncroForge.Models.User;
+using taskk = SyncroForge.Models.Task;
 namespace SyncroForge.Services.User
 {
     public class UserService : IUserService
@@ -14,6 +15,61 @@ namespace SyncroForge.Services.User
         public UserService(AppDbContext appDbContext) {
             _appDbContext = appDbContext;
                 }
+
+        public async Task<MainResponse> GetDashboard(int userId)
+        {
+            List<int> employees=(await _appDbContext.Employees.Where(i=>i.UserId== userId).ToListAsync()).Select(i=>i.Id).ToList();
+            var tasksJoinedCompanies = await _appDbContext.Tasks
+    .Include(t => t.Status)
+    .Where(t => employees.Contains(t.AssigneeId))
+    .GroupBy(t => t.Status.Name)
+    .Select(g => new
+    {
+        name = g.Key,
+        value = g.Count(),
+        color = g.First().Status.BackgroundColor
+    })
+    .ToListAsync();
+            List<int> companies= (await _appDbContext.Companies.Where(i => i.CreatedBy == userId).ToListAsync()).Select(i => i.Id).ToList();
+
+            List<int> departments= (await _appDbContext.Departments.Where(i => companies.Contains(i.CompanyId)).ToListAsync()).Select(i => i.Id).ToList();
+            var tasksOwnedCompanies = await _appDbContext.Tasks
+.Include(t => t.Status)
+.Where(t => departments.Contains(t.DepartmentId))
+.GroupBy(t => t.Status.Name)
+.Select(g => new
+{
+name = g.Key,
+value = g.Count(),
+color=g.First().Status.BackgroundColor
+})
+.ToListAsync();
+
+            var companiesOwnedEmployees = await _appDbContext.Companies.Include(i => i.Employees).Where(i => i.CreatedBy == userId).Select(
+                c => new
+                {
+                    Company = c.Name,
+                    EmployeesCount = c.Employees.Count()
+                }
+                ).ToListAsync();
+
+            return new MainResponse()
+            {
+                Code = 200,
+                Message = "dashboard returned success",
+                Status = 200,
+                data=new
+                {
+                    joinedCompaniesTaskDashboard= tasksJoinedCompanies,
+                    ownedCompaniesTaskDashboard = tasksOwnedCompanies,
+                    ownedCompaniesEmployees= companiesOwnedEmployees
+                },
+                Success = true,
+                Type = "success"
+            };
+
+            
+        }
 
         public async Task<MainResponse> GetInvitations(GetInvitationsRequest request, int userId, string publicUserId)
         {
