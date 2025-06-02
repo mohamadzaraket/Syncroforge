@@ -8,6 +8,6 @@ namespace SyncroForge.Services.TaskService
         public Task<MainResponse> AddTask(AddTaskRequest request, string userPublicKey, int userId);
         public Task<MainResponse> GetTasks( int userId, string userPublicKey);
         public Task<MainResponse> UpdateTask(UpdateTaskRequest request, string userPublicKey, int userId);
-        public Task<MainResponse> GetTask(string id);
+        public Task<MainResponse> GetTask(string id,int userId);
     }
 }

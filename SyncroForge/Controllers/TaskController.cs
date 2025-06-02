@@ -127,8 +127,11 @@ namespace SyncroForge.Controllers
             {
                 return BadRequest(ModelState);
             }
+                string userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = int.Parse(userIdString);
 
-            MainResponse response = await _TaskService.GetTask(id);
+
+                MainResponse response = await _TaskService.GetTask(id, userId);
             return StatusCode(response.Status, response);
 
         }

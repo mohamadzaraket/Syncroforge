@@ -7,9 +7,9 @@ namespace SyncroForge.Requests.Task
         [Required]
         public string TaskIdentifier { get; set; }
         public string? ParentTaskIdentifier { get; set; }
-        public string Summary { get; set; }
-        public string Description { get; set; }
-        public string AssigneeIdentifier { get; set; }
-        public string StatusIdentifier { get; set; }
+        public string? Summary { get; set; }
+        public string? Description { get; set; }
+        public string? AssigneeIdentifier { get; set; }
+        public string? StatusIdentifier { get; set; }
     }
 }

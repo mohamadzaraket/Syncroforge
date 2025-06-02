@@ -89,9 +89,9 @@ namespace SyncroForge.Services.TaskService
 
         }
 
-        public async Task<MainResponse> GetTask(string id)
+        public async Task<MainResponse> GetTask(string id,int userId)
         {
-            Task? task = await _context.Tasks.Include(i => i.SubTasks).ThenInclude(i => i.Status).Include(i => i.SubTasks).ThenInclude(i => i.Creator).Include(i => i.SubTasks).ThenInclude(i => i.Assignee).ThenInclude(i => i.User).Include(i => i.Assignee).ThenInclude(i => i.User).Include(i => i.Creator).Include(i => i.Status).Include(i => i.ParentTask).Where(i => i.PublicKey == id).FirstOrDefaultAsync();
+            Task? task = await _context.Tasks.Include(i => i.SubTasks).ThenInclude(i => i.Status).Include(i => i.SubTasks).ThenInclude(i => i.Creator).Include(i => i.SubTasks).ThenInclude(i => i.Assignee).ThenInclude(i => i.User).Include(i => i.Assignee).ThenInclude(i => i.User).Include(i => i.Creator).Include(i => i.Status).Include(i => i.ParentTask).Include(i=>i.Department).ThenInclude(i=>i.Company).Where(i => i.PublicKey == id).FirstOrDefaultAsync();
             if (task == null)
             {
                 return new MainResponse()
@@ -104,6 +104,15 @@ namespace SyncroForge.Services.TaskService
                     data = task,
                 };
             }
+            bool isCreatedBy = false;
+            Department dep = task.Department;
+            if (dep.Company.CreatedBy == userId)
+            {
+                isCreatedBy = true;
+
+            }
+            
+
 
             return new MainResponse()
             {
@@ -114,6 +123,7 @@ namespace SyncroForge.Services.TaskService
                 Type = "success",
                 data = new
                 {
+                    isCreatedBy=isCreatedBy,
                     summary = task.Summary,
                     description = task.Description,
                     status = new
@@ -267,13 +277,13 @@ namespace SyncroForge.Services.TaskService
             // Only save history if there are actual changes
             if (changes.Count > 0)
             {
-                _context.TaskHistories.Add(new TaskHistory
+               /* _context.TaskHistories.Add(new TaskHistory
                 {
                     TaskId = task.Id,
                     Type = "Update",
                     EmployeeId = userId,
                     Value = string.Join("; ", changes)
-                });
+                });*/
             }
 
             task.CreatedById = userId;
