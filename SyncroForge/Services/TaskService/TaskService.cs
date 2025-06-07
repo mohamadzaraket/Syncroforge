@@ -5,6 +5,7 @@ using SyncroForge.Hubs;
 using SyncroForge.Models;
 using SyncroForge.Requests.Task;
 using SyncroForge.Responses;
+using SyncroForge.Services.Otp;
 using Task = SyncroForge.Models.Task;
 
 namespace SyncroForge.Services.TaskService
@@ -13,10 +14,14 @@ namespace SyncroForge.Services.TaskService
     {
         private readonly AppDbContext _context;
         private readonly IHubContext<TaskHub> _hubContext;
-        public TaskService(AppDbContext context, IHubContext<TaskHub> hubContext)
+        private readonly IOtpService _otpService;
+        private readonly IConfiguration _configuration;
+        public TaskService(AppDbContext context, IHubContext<TaskHub> hubContext,IOtpService service, IConfiguration configuration)
         {
             _context = context;
             _hubContext = hubContext;
+            _otpService = service;
+            _configuration = configuration;
         }
 
         public async Task<MainResponse> AddTask(AddTaskRequest request, string userPublicKey, int userId)
@@ -35,7 +40,7 @@ namespace SyncroForge.Services.TaskService
 
             }
 
-            Employee? employee = await _context.Employees.Where(i => i.PublicKey == request.AssigneeIdentifier && i.IsDeleted == false).FirstOrDefaultAsync();
+            Employee? employee = await _context.Employees.Include(i=>i.User).Where(i => i.PublicKey == request.AssigneeIdentifier && i.IsDeleted == false).FirstOrDefaultAsync();
             if (employee == null)
             {
                 return new MainResponse()
@@ -61,7 +66,7 @@ namespace SyncroForge.Services.TaskService
                 };
 
             }
-            Task? taskk = await _context.Tasks.Where(i => i.PublicKey == request.ParentTaskIdentifier && i.IsDeleted == false).FirstOrDefaultAsync();
+            Task? taskk = await _context.Tasks.Include(i=>i.Department).Where(i => i.PublicKey == request.ParentTaskIdentifier && i.IsDeleted == false).FirstOrDefaultAsync();
             Task task = new Task();
             task.AssigneeId = employee.Id;
             task.CreatedById = userId;
@@ -77,6 +82,8 @@ namespace SyncroForge.Services.TaskService
 
 
             await _context.SaveChangesAsync();
+            string taskPath = $"{_configuration["Frontend:URL"]}/user/department/{task.Department.PublicKey}/task/{task.PublicKey}";
+            _otpService.SendEmail("New Assigned Task", $"A new task is assigned to you:{taskPath}", employee.User.Email);
 
             return new MainResponse()
             {
