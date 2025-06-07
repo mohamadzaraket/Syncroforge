@@ -10,6 +10,10 @@ using SyncroForge.Models;
 using Microsoft.EntityFrameworkCore;
 using Otpp = SyncroForge.Models.Otp;
 using userr = SyncroForge.Models.User;
+using Azure.Core;
+using MailKit.Net.Smtp;
+using System.Net.Mail;
+using MimeKit;
 
 namespace SyncroForge.Services.Otp
 {
@@ -44,7 +48,7 @@ namespace SyncroForge.Services.Otp
             await _context.Otps.AddAsync(new Otpp { Email = request.Email, OtpNumber = otp,type="Register" });
             await _context.SaveChangesAsync();
 
-            SendEmail("Register Otp", "Register Otp", otp.ToString("D6"), request.Email);
+            SendEmail("Register Otp", $"your email verification code is:{otp.ToString()}",request.Email);
 
 
                 return new RegisterResponse()
@@ -62,47 +66,106 @@ namespace SyncroForge.Services.Otp
 
 
         }
-        public async void SendEmail(string Title, string Subject, string Otp, string toEmail)
+        /*public async System.Threading.Tasks.Task SendEmail(string title, string subject, string otp, string toEmail)
         {
-
-            var requestData = new
+            try
             {
-                from = new
+                var requestData = new
                 {
-                    email = _configuration.GetSection("mailSender:fromEmail").Value,
-                    name = _configuration.GetSection("mailSender:name").Value,
-
-                },
-                to = new List<object> {
-                    new
+                    from = new
                     {
-                        email = toEmail
-                    }
-                },
-                subject = Subject,
-                template_id = _configuration.GetSection("mailSender:templateId").Value,
-                personalization = new List<object>
+                        email = _configuration["mailSender:fromEmail"],
+                        name = _configuration["mailSender:name"]
+                    },
+                    to = new List<object>
+            {
+                new { email = toEmail }
+            },
+                    subject = subject,
+                    template_id = _configuration["mailSender:templateId"],
+                    personalization = new List<object>
+            {
+                new
                 {
-                    new
+                    email = toEmail,
+                    data = new
                     {
-                        email = toEmail,
-                        data = new
-                        {
-                            otp = Otp,
-                            title = Title
-                        }
+                        otp = otp,
+                        title = title
                     }
                 }
+            }
+                };
+
+                string jsonString = JsonSerializer.Serialize(requestData, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+                _httpClient.DefaultRequestHeaders.Clear(); // clear old headers
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["mailSender:accessToken"]);
+                Console.WriteLine($"TOKEN USED: {_configuration["mailSender:accessToken"]}"); // debug
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                HttpResponseMessage response = await _httpClient.PostAsync(_configuration["mailSender:url"], content);
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Failed to send email. Status: {response.StatusCode}, Body: {responseBody}");
+                    // Optionally: throw new Exception($"MailerSend failed: {response.StatusCode}");
+                }
+                else
+                {
+                    Console.WriteLine("Email sent successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in SendEmail: {ex.Message}");
+                // Optionally rethrow or log in file
+            }
+        }*/
+        public async System.Threading.Tasks.Task SendEmail(string title, string value, string toEmail)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("Syncroforge", "Syncroforge@outlook.com"));
+
+                message.To.Add(new MailboxAddress(toEmail, toEmail));
+                message.Subject = title;
+                var body = value; 
+                message.Body = new TextPart("plain")
+                {
+                    Text = body
+
+                };
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                    client.Connect(_configuration["smtp:server"], int.Parse(_configuration["smtp:port"]), false);
 
 
-            };
-            string jsonString = JsonSerializer.Serialize(requestData, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-            var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration.GetSection("mailSender:accessToken").Value);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            HttpResponseMessage response = await _httpClient.PostAsync(_configuration.GetSection("mailSender:url").Value, content);
+                    client.Authenticate(_configuration["smtp:email-auth"], _configuration["smtp:email-apppassword"]);
 
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in SendEmail: {ex.Message}");
+                // Optionally rethrow or log in file
+            }
         }
+
 
 
 
