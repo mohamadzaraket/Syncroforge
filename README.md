@@ -1,4 +1,4 @@
-<img width="1808" height="938" alt="image" src="https://github.com/user-attachments/assets/cdd2b5a8-0336-47b1-9062-43f9568ebf9d" />login page:
+login page:
 <img width="1847" height="925" alt="image" src="https://github.com/user-attachments/assets/18214a04-9c06-4861-9b28-45cb906ede9c" />
 sign up page:
 <img width="1484" height="830" alt="image" src="https://github.com/user-attachments/assets/9e5a5050-7669-424f-8506-74d431282385" />
