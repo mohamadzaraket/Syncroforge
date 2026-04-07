@@ -17,4 +17,6 @@ assign employee to department:
 <img width="1794" height="912" alt="image" src="https://github.com/user-attachments/assets/3ea4691d-9ec8-45db-a401-f7b98386bc4d" />
 add task for specific department to specific employee:
 <img width="1893" height="857" alt="image" src="https://github.com/user-attachments/assets/ace4f651-db6e-4c63-85e4-842d60f23b1c" />
-......
+scan employee photos for ai training for door detection:
+<img width="1890" height="967" alt="image" src="https://github.com/user-attachments/assets/0cd2d283-2b74-49ad-906c-b77f48de2052" />
+<img width="1824" height="920" alt="image" src="https://github.com/user-attachments/assets/66c6938f-2181-40a6-b0aa-473409309c68" />
