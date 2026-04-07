@@ -20,3 +20,4 @@ add task for specific department to specific employee:
 scan employee photos for ai training for door detection:
 <img width="1890" height="967" alt="image" src="https://github.com/user-attachments/assets/0cd2d283-2b74-49ad-906c-b77f48de2052" />
 <img width="1824" height="920" alt="image" src="https://github.com/user-attachments/assets/66c6938f-2181-40a6-b0aa-473409309c68" />
+<img width="1914" height="946" alt="image" src="https://github.com/user-attachments/assets/a125ccbb-c060-4bb2-b57f-94e1751e3f95" />
